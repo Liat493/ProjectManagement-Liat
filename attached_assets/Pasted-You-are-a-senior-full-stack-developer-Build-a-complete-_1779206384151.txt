@@ -1,0 +1,381 @@
+You are a senior full-stack developer. 
+Build a complete working web application for a Smart Learning System – Student Analytics Module.
+
+The application should implement Sprint 2 Core Features only, based on the following user stories and requirements.
+
+Project Name:
+Smart Learning System – Student Analytics Module
+
+Main Goal:
+Create a student-facing analytics dashboard that helps students understand their academic status, compare their performance to the class, track average grades, manage weekly assignments, and analyze submission rate.
+
+The system must include both frontend and backend logic, with a working database. 
+The project should be simple enough for a student project, but professional, organized, and fully functional.
+
+Use this recommended stack unless the current Replit environment requires something else:
+- Frontend: React
+- Backend: Node.js + Express
+- Database: SQLite
+- Charts: Recharts or Chart.js
+- Styling: Clean CSS, modern dashboard layout, responsive design
+
+General Requirements:
+1. Build a full web app with a dashboard layout.
+2. Include a sidebar or top navigation with the following pages:
+   - Dashboard
+   - Comparison to Class Average
+   - Average Grade
+   - Weekly Submission Schedule
+   - Submission Rate
+3. Use a real SQLite database, not only hardcoded frontend data.
+4. Add seed data automatically when the app starts if the database is empty.
+5. The system should support at least one logged-in demo student.
+6. Do not implement real authentication unless necessary. Use a fixed demo student ID.
+7. The UI should look like a real student analytics system.
+8. Include clear visual indicators, cards, tables, filters, graphs, and status labels.
+9. Code must be organized into folders:
+   - server/
+   - client/
+   - database/
+   - routes/
+   - components/
+   - pages/
+10. Add comments only where they help understand important logic.
+11. Make sure the project runs successfully in Replit.
+
+Database Requirements:
+Create a SQLite database with the following tables:
+
+1. students
+Fields:
+- id
+- full_name
+- email
+- semester
+- created_at
+
+2. courses
+Fields:
+- id
+- course_name
+- course_code
+- semester
+- created_at
+
+3. student_courses
+Fields:
+- id
+- student_id
+- course_id
+
+4. grades
+Fields:
+- id
+- student_id
+- course_id
+- grade
+- weight
+- grade_type
+- grade_date
+- created_at
+
+5. class_averages
+Fields:
+- id
+- course_id
+- average_grade
+- average_submission_rate
+- calculation_date
+
+6. assignments
+Fields:
+- id
+- course_id
+- title
+- description
+- due_date
+- status
+- created_at
+
+The assignment status can be:
+- pending
+- completed
+- overdue
+- missed
+
+7. submissions
+Fields:
+- id
+- student_id
+- assignment_id
+- submitted_at
+- status
+
+The submission status can be:
+- submitted
+- late
+- missed
+
+8. submission_goals
+Fields:
+- id
+- student_id
+- target_rate
+
+Seed Data:
+Insert realistic demo data:
+- One student named Alex Cohen
+- At least 4 courses:
+  - Mathematics
+  - Software Engineering
+  - English
+  - Physics
+- Multiple grades per course
+- Class average data for each course
+- Assignments with different due dates:
+  - some due today
+  - some due in the next 7 days
+  - some overdue
+  - some completed
+- Submission records that allow calculating submission rate
+- A default personal submission target, for example 90%
+
+Feature 1: Comparison to Class Average
+Implement the following user stories:
+1. As a student, I want to compare my grades to the class average, so that I understand my standing.
+2. As a student, I want to see a graph comparing my performance to the class, so that I can visualize differences.
+3. As a student, I want comparison per course, so that I can analyze specific subjects.
+4. As a student, I want comparison over time, so that I can track improvement relative to others.
+5. As a student, I want anonymized class data, so that privacy is maintained.
+6. As a student, I want visual indicators for comparison, such as colors and labels, so that I can quickly understand my position.
+7. The system shall calculate and display the class average comparison within 2 seconds.
+
+Implementation details:
+- Create an API endpoint:
+  GET /api/comparison/:studentId
+- Return for each course:
+  - course name
+  - student average
+  - class average
+  - difference
+  - status label:
+    - Above Average
+    - Close to Average
+    - Below Average
+- Display the comparison in a table and a bar chart.
+- Do not show names of other students. The class average must be anonymized.
+- Add a course filter.
+- Add visual color labels:
+  - Above Average
+  - Close to Average
+  - Below Average
+- Add a short explanation card telling the student what the comparison means.
+
+Feature 2: Average Grade
+Implement the following user stories:
+8. As a student, I want to see my average grade per course, so that I can evaluate my performance.
+9. As a student, I want to view my overall GPA/average, so that I understand my academic standing.
+10. As a student, I want my average to update automatically after new grades, so that it stays current.
+11. As a student, I want to see grade breakdowns, so that I understand how my average is calculated.
+12. As a student, I want to view trends in my average over time, so that I can track progress.
+13. As a student, I want to filter averages by semester, so that I can analyze specific periods.
+14. As a student, I want visual graphs for averages, so that I can easily interpret my performance.
+
+Implementation details:
+- Create API endpoints:
+  GET /api/grades/:studentId/averages
+  GET /api/grades/:studentId/breakdown/:courseId
+  POST /api/grades
+- Calculate weighted average per course.
+- Calculate overall average/GPA based on all student grades.
+- Display:
+  - Overall average card
+  - Average per course cards
+  - Grade breakdown table
+  - Line chart showing average trend over time
+  - Bar chart showing course averages
+- Add semester filter.
+- Add a simple form for adding a new grade:
+  - course
+  - grade
+  - weight
+  - grade type
+  - date
+- After adding a grade, the averages and charts must update automatically.
+
+Feature 3: Weekly Submission Schedule
+Implement the following user stories:
+22. As a student, I want to see all my upcoming assignments for the week, so that I can plan my time effectively.
+23. As a student, I want to view assignments ordered by urgency, so that I can prioritize my workload efficiently.
+24. As a student, I want to receive reminders before assignment deadlines, so that I don’t miss submissions.
+25. As a student, I want to mark assignments as completed, so that I can track my progress and stay organized.
+26. As a student, I want to clearly identify overdue assignments, so that I can take immediate action.
+27. As a student, I want to filter assignments by course, so that I can focus on specific subjects.
+28. As a student, I want to view my assignments in a calendar format, so that I can better visualize and manage my schedule.
+
+Implementation details:
+- Create API endpoints:
+  GET /api/assignments/:studentId/weekly
+  PUT /api/assignments/:assignmentId/complete
+- Display assignments due within the next 7 days.
+- Sort assignments by due date from closest to farthest.
+- Show reminders for assignments due within 24 hours.
+- Clearly mark overdue assignments.
+- Allow the student to mark assignment as completed.
+- Completion status must be saved in the database and remain after page refresh.
+- Add course filter.
+- Add two views:
+  - List view
+  - Simple weekly calendar view
+- In list view, show:
+  - assignment title
+  - course name
+  - due date
+  - status
+  - urgency label
+  - button to mark as completed
+- In calendar view, group assignments by day.
+
+Feature 4: Submission Rate
+Implement the following user stories:
+36/37. As a student, I want to view my overall submission rate with visual indicators that update automatically, so that I understand my performance at a glance.
+37/38. As a student, I want to see which assignments I missed, so that I can improve my submission habits.
+38/39. As a student, I want to filter submission rates by course, so that I can analyze specific subjects.
+39/40. As a student, I want to compare submission rates over time, so that I can track improvement.
+40/41. As a student, I want to receive alerts when my submission rate drops, so that I can take action quickly.
+41/42. As a student, I want to set a target submission rate, so that I can track my personal goals.
+42/43. As a student, I want to compare my submission rate to the class average, so that I understand my relative performance.
+
+Important note:
+The project document has a small numbering mismatch around Submission Rate. Implement the Submission Rate feature according to the feature content, not only the story numbers.
+
+Implementation details:
+- Create API endpoints:
+  GET /api/submissions/:studentId/rate
+  GET /api/submissions/:studentId/missed
+  PUT /api/submissions/:studentId/goal
+- Calculate:
+  - total assignments
+  - submitted assignments
+  - late submissions
+  - missed assignments
+  - overall submission rate percentage
+  - submission rate per course
+  - comparison to class average submission rate
+- Display:
+  - overall submission rate card
+  - progress bar
+  - course-based submission rate table
+  - missed assignments list
+  - line chart for submission rate over time
+  - target submission rate card
+  - comparison to class average
+- Allow the student to set or update a target submission rate.
+- Show an alert if the actual submission rate is below the target rate.
+- Show an alert if the submission rate is below 60%.
+- Use visual labels:
+  - Excellent
+  - Good
+  - Needs Improvement
+  - Critical
+
+Dashboard Page:
+Create a main dashboard that summarizes all Sprint 2 features:
+- Overall average
+- Best course
+- Weakest course
+- Submission rate
+- Number of assignments due this week
+- Number of overdue assignments
+- Class comparison summary
+- Alerts or warnings
+- Quick navigation buttons to each feature page
+
+Backend Requirements:
+- Use Express routes.
+- Use SQLite database.
+- Create database initialization script.
+- Create seed script.
+- Use async/await where needed.
+- Validate input for POST and PUT requests.
+- Return proper JSON responses.
+- Handle errors gracefully.
+
+Frontend Requirements:
+- React app with clean structure.
+- Use reusable components:
+  - StatCard
+  - CourseFilter
+  - GradeChart
+  - ComparisonChart
+  - AssignmentList
+  - CalendarView
+  - SubmissionRateChart
+  - AlertBox
+- Use responsive layout.
+- Use loading states.
+- Use error states.
+- Make the design simple, modern, and readable.
+- Use clear headings and explanations so the project looks academic and professional.
+
+Business Logic Requirements:
+1. Average Grade:
+   - Weighted average formula:
+     sum(grade * weight) / sum(weight)
+   - If no grades exist, show “No grades available”.
+
+2. Class Comparison:
+   - difference = studentAverage - classAverage
+   - Above Average if difference > 5
+   - Close to Average if difference between -5 and 5
+   - Below Average if difference < -5
+
+3. Weekly Assignments:
+   - Upcoming assignments are assignments with due date from today to 7 days ahead.
+   - Overdue assignments are assignments with due date before today and not completed.
+   - Reminder appears when assignment is due within 24 hours.
+
+4. Submission Rate:
+   - submissionRate = submittedAssignments / totalAssignments * 100
+   - Late submissions should still count as submitted, but should be shown separately.
+   - Missed submissions should reduce the rate.
+   - If actual rate < target rate, show warning.
+   - If actual rate < 60%, show critical alert.
+
+Pages to Build:
+1. Dashboard
+2. Comparison to Class Average
+3. Average Grade
+4. Weekly Submission Schedule
+5. Submission Rate
+
+Deliverables:
+- Fully working project in Replit.
+- All code files created.
+- Database initialized automatically.
+- Seed data inserted automatically.
+- App runs with one command.
+- Clear README.md with:
+  - project description
+  - features
+  - database structure
+  - how to run
+  - API endpoints
+  - demo student information
+
+Important:
+Do not only create a static UI.
+The app must use backend API calls and database data.
+All calculations should be done in the backend where appropriate.
+Frontend should display the processed data clearly.
+
+Before finishing:
+1. Test that the app starts without errors.
+2. Test that each page loads.
+3. Test that charts display data.
+4. Test that adding a grade updates averages.
+5. Test that marking assignment as completed persists after refresh.
+6. Test that updating submission target works.
+7. Make sure there are no missing imports or broken routes.
+
+Now generate the complete project files.

@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Smart Learning System"
+version = "1.0.0"
+id = "artifacts/student-analytics"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20334
+
+[services.development]
+run = "pnpm --filter @workspace/student-analytics run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/student-analytics", "run", "build" ]
+publicDir = "artifacts/student-analytics/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20334"
+BASE_PATH = "/"

@@ -1,36 +1,458 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Smart Learning System - Student Analytics API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: dashboard
+  - name: comparison
+  - name: grades
+  - name: assignments
+  - name: submissions
+  - name: courses
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
           content:
             application/json:
+              schema: { $ref: "#/components/schemas/HealthStatus" }
+  /dashboard/{studentId}:
+    get:
+      operationId: getDashboard
+      tags: [dashboard]
+      parameters:
+        - in: path
+          name: studentId
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DashboardSummary" }
+  /students/{studentId}/courses:
+    get:
+      operationId: getStudentCourses
+      tags: [courses]
+      parameters:
+        - in: path
+          name: studentId
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Student's courses
+          content:
+            application/json:
               schema:
-                $ref: "#/components/schemas/HealthStatus"
+                type: array
+                items: { $ref: "#/components/schemas/Course" }
+  /comparison/{studentId}:
+    get:
+      operationId: getComparison
+      tags: [comparison]
+      parameters:
+        - in: path
+          name: studentId
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Per-course comparison data
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ComparisonReport" }
+  /grades/{studentId}/averages:
+    get:
+      operationId: getAverages
+      tags: [grades]
+      parameters:
+        - in: path
+          name: studentId
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Averages
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AveragesReport" }
+  /grades/{studentId}/breakdown/{courseId}:
+    get:
+      operationId: getGradeBreakdown
+      tags: [grades]
+      parameters:
+        - in: path
+          name: studentId
+          required: true
+          schema: { type: integer }
+        - in: path
+          name: courseId
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Breakdown
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GradeBreakdown" }
+  /grades:
+    post:
+      operationId: addGrade
+      tags: [grades]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/GradeInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Grade" }
+  /assignments/{studentId}/weekly:
+    get:
+      operationId: getWeeklyAssignments
+      tags: [assignments]
+      parameters:
+        - in: path
+          name: studentId
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Weekly assignments
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/WeeklyAssignment" }
+  /assignments/{assignmentId}/complete:
+    put:
+      operationId: completeAssignment
+      tags: [assignments]
+      parameters:
+        - in: path
+          name: assignmentId
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AssignmentCompleteInput" }
+      responses:
+        "200":
+          description: Completed
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WeeklyAssignment" }
+  /submissions/{studentId}/rate:
+    get:
+      operationId: getSubmissionRate
+      tags: [submissions]
+      parameters:
+        - in: path
+          name: studentId
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Submission rate report
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SubmissionRateReport" }
+  /submissions/{studentId}/missed:
+    get:
+      operationId: getMissedAssignments
+      tags: [submissions]
+      parameters:
+        - in: path
+          name: studentId
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Missed assignments
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/MissedAssignment" }
+  /submissions/{studentId}/goal:
+    put:
+      operationId: updateSubmissionGoal
+      tags: [submissions]
+      parameters:
+        - in: path
+          name: studentId
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SubmissionGoalInput" }
+      responses:
+        "200":
+          description: Updated goal
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SubmissionGoal" }
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
-        status:
-          type: string
+        status: { type: string }
+    Course:
+      type: object
+      required: [id, courseName, courseCode, semester]
+      properties:
+        id: { type: integer }
+        courseName: { type: string }
+        courseCode: { type: string }
+        semester: { type: string }
+    DashboardSummary:
+      type: object
       required:
+        - studentName
+        - overallAverage
+        - bestCourse
+        - weakestCourse
+        - submissionRate
+        - dueThisWeek
+        - overdueCount
+        - classComparisonSummary
+        - alerts
+      properties:
+        studentName: { type: string }
+        overallAverage: { type: ["number", "null"] }
+        bestCourse: { type: ["string", "null"] }
+        weakestCourse: { type: ["string", "null"] }
+        submissionRate: { type: number }
+        dueThisWeek: { type: integer }
+        overdueCount: { type: integer }
+        classComparisonSummary: { type: string }
+        alerts:
+          type: array
+          items: { type: string }
+    ComparisonItem:
+      type: object
+      required:
+        - courseId
+        - courseName
+        - studentAverage
+        - classAverage
+        - difference
         - status
-
+      properties:
+        courseId: { type: integer }
+        courseName: { type: string }
+        studentAverage: { type: ["number", "null"] }
+        classAverage: { type: number }
+        difference: { type: ["number", "null"] }
+        status: { type: string }
+    ComparisonTrendPoint:
+      type: object
+      required: [date, studentAverage, classAverage]
+      properties:
+        date: { type: string }
+        studentAverage: { type: number }
+        classAverage: { type: number }
+    ComparisonReport:
+      type: object
+      required: [items, trend]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/ComparisonItem" }
+        trend:
+          type: array
+          items: { $ref: "#/components/schemas/ComparisonTrendPoint" }
+    CourseAverage:
+      type: object
+      required: [courseId, courseName, average, gradeCount]
+      properties:
+        courseId: { type: integer }
+        courseName: { type: string }
+        average: { type: ["number", "null"] }
+        gradeCount: { type: integer }
+    TrendPoint:
+      type: object
+      required: [date, average]
+      properties:
+        date: { type: string }
+        average: { type: number }
+    AveragesReport:
+      type: object
+      required: [overall, perCourse, trend, semesters]
+      properties:
+        overall: { type: ["number", "null"] }
+        perCourse:
+          type: array
+          items: { $ref: "#/components/schemas/CourseAverage" }
+        trend:
+          type: array
+          items: { $ref: "#/components/schemas/TrendPoint" }
+        semesters:
+          type: array
+          items: { type: string }
+    Grade:
+      type: object
+      required:
+        - id
+        - studentId
+        - courseId
+        - grade
+        - weight
+        - gradeType
+        - gradeDate
+      properties:
+        id: { type: integer }
+        studentId: { type: integer }
+        courseId: { type: integer }
+        grade: { type: number }
+        weight: { type: number }
+        gradeType: { type: string }
+        gradeDate: { type: string }
+    GradeBreakdown:
+      type: object
+      required: [courseId, courseName, grades, weightedAverage]
+      properties:
+        courseId: { type: integer }
+        courseName: { type: string }
+        weightedAverage: { type: ["number", "null"] }
+        grades:
+          type: array
+          items: { $ref: "#/components/schemas/Grade" }
+    GradeInput:
+      type: object
+      required: [studentId, courseId, grade, weight, gradeType, gradeDate]
+      properties:
+        studentId: { type: integer }
+        courseId: { type: integer }
+        grade: { type: number, minimum: 0, maximum: 100 }
+        weight: { type: number, minimum: 0 }
+        gradeType: { type: string, minLength: 1 }
+        gradeDate: { type: string }
+    WeeklyAssignment:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - courseId
+        - courseName
+        - dueDate
+        - status
+        - urgency
+        - isOverdue
+        - hoursUntilDue
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        description: { type: string }
+        courseId: { type: integer }
+        courseName: { type: string }
+        dueDate: { type: string }
+        status: { type: string }
+        urgency: { type: string }
+        isOverdue: { type: boolean }
+        hoursUntilDue: { type: number }
+    AssignmentCompleteInput:
+      type: object
+      required: [studentId]
+      properties:
+        studentId: { type: integer }
+    CourseSubmissionRate:
+      type: object
+      required:
+        - courseId
+        - courseName
+        - total
+        - submitted
+        - late
+        - missed
+        - rate
+        - classAverage
+      properties:
+        courseId: { type: integer }
+        courseName: { type: string }
+        total: { type: integer }
+        submitted: { type: integer }
+        late: { type: integer }
+        missed: { type: integer }
+        rate: { type: number }
+        classAverage: { type: number }
+    SubmissionRatePoint:
+      type: object
+      required: [date, rate]
+      properties:
+        date: { type: string }
+        rate: { type: number }
+    SubmissionRateReport:
+      type: object
+      required:
+        - overall
+        - total
+        - submitted
+        - late
+        - missed
+        - target
+        - classAverage
+        - label
+        - perCourse
+        - trend
+        - alerts
+      properties:
+        overall: { type: number }
+        total: { type: integer }
+        submitted: { type: integer }
+        late: { type: integer }
+        missed: { type: integer }
+        target: { type: number }
+        classAverage: { type: number }
+        label: { type: string }
+        perCourse:
+          type: array
+          items: { $ref: "#/components/schemas/CourseSubmissionRate" }
+        trend:
+          type: array
+          items: { $ref: "#/components/schemas/SubmissionRatePoint" }
+        alerts:
+          type: array
+          items: { type: string }
+    MissedAssignment:
+      type: object
+      required: [id, title, courseName, dueDate, status]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        courseName: { type: string }
+        dueDate: { type: string }
+        status: { type: string }
+    SubmissionGoal:
+      type: object
+      required: [studentId, targetRate]
+      properties:
+        studentId: { type: integer }
+        targetRate: { type: number }
+    SubmissionGoalInput:
+      type: object
+      required: [targetRate]
+      properties:
+        targetRate: { type: number, minimum: 0, maximum: 100 }
