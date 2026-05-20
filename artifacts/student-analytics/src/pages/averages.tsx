@@ -45,8 +45,10 @@ const gradeSchema = z.object({
 
 type GradeFormValues = z.infer<typeof gradeSchema>;
 
+import { useStudentId } from "@/contexts/auth-context";
+
 export default function Averages() {
-  const studentId = 1;
+  const studentId = useStudentId();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isAddOpen, setIsAddOpen] = useState(false);

@@ -1,0 +1,543 @@
+I already have a working Smart Learning System project in Replit.
+
+This is an improvement task for an existing system.
+Do not rebuild the project from scratch.
+Do not delete existing features.
+Do not replace the current database.
+Do not break existing modules.
+
+Your task is to add a real Login and Signup system to the existing Smart Learning System, including database support, so the demo can remember registered users between sessions.
+
+Project:
+Smart Learning System – Student Analytics Module
+
+Existing Modules:
+- Dashboard
+- Comparison to Class Average
+- Average Grade
+- Weekly Submission Schedule
+- Submission Rate
+
+Main Goal:
+Add authentication functionality to the existing system so users can create an account, log in, and access their own student analytics data.
+
+Important:
+This is not a new project.
+First inspect the current codebase and database structure.
+Then add authentication in a safe way while keeping the existing app working.
+
+Required Features:
+1. Signup page
+2. Login page
+3. Logout button
+4. Remember logged-in user
+5. Store users in SQLite database
+6. Connect each user to their own student profile
+7. Protect dashboard/module pages from unauthenticated access
+8. Keep demo data working
+
+Recommended Stack:
+Use the current project stack.
+If the project already uses:
+- React frontend
+- Node.js + Express backend
+- SQLite database
+
+Continue using them.
+
+Authentication Requirements:
+
+1. Signup
+
+Create a Signup page where a new user can register.
+
+Signup form fields:
+- Full name
+- Email
+- Password
+- Confirm password
+- Semester, optional or default value
+
+Validation:
+- Full name is required
+- Email is required
+- Email must be unique
+- Password is required
+- Password must be at least 6 characters
+- Confirm password must match password
+- Show a clear error message if validation fails
+
+When signup succeeds:
+- Create a new user in the database
+- Create a linked student profile
+- Log the user in automatically OR redirect to login page
+- Show a success message
+
+2. Login
+
+Create a Login page where an existing user can log in.
+
+Login form fields:
+- Email
+- Password
+
+Validation:
+- Email is required
+- Password is required
+- If email does not exist, show a clear error
+- If password is incorrect, show a clear error
+
+When login succeeds:
+- Store logged-in user information in the frontend state/localStorage
+- Redirect the user to Dashboard
+- Load analytics data based on the logged-in student ID
+
+3. Logout
+
+Add a Logout button in the app layout/sidebar/header.
+
+Behavior:
+- Clear logged-in user from localStorage/session state
+- Redirect user to Login page
+- Protected pages should no longer be accessible until login again
+
+4. Remember User
+
+The system should remember the logged-in user after page refresh.
+
+Behavior:
+- Store authentication token or logged-in user object in localStorage
+- On app load, check if a valid user is stored
+- If valid, keep the user logged in
+- If not valid, redirect to Login
+
+For this student project, a simple token/session approach is acceptable.
+Do not use browser alert().
+Use styled feedback messages.
+
+Database Improvements:
+
+Update the existing SQLite database by adding authentication-related tables.
+
+Do not remove existing tables.
+Do not delete existing seed data.
+Do not break current tables like students, courses, grades, assignments, submissions, class_averages, or submission_goals.
+
+Add or update the database structure as follows:
+
+Table: users
+
+Fields:
+- id INTEGER PRIMARY KEY AUTOINCREMENT
+- full_name TEXT NOT NULL
+- email TEXT NOT NULL UNIQUE
+- password_hash TEXT NOT NULL
+- role TEXT DEFAULT 'student'
+- created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+- updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+
+Purpose:
+Stores login credentials and account information.
+
+Important:
+Do not store plain text passwords.
+Use password hashing with bcrypt if available.
+If bcrypt is not installed, install and use bcryptjs.
+
+Table: students
+
+If the existing students table already exists, update it carefully if needed.
+
+Recommended students table fields:
+- id INTEGER PRIMARY KEY AUTOINCREMENT
+- user_id INTEGER UNIQUE
+- full_name TEXT NOT NULL
+- email TEXT NOT NULL
+- semester TEXT
+- created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+- FOREIGN KEY (user_id) REFERENCES users(id)
+
+Purpose:
+Stores student profile information connected to a user account.
+
+Important:
+Each user should have one student profile.
+All analytics data should be connected to student_id.
+
+Existing system tables should continue working:
+
+Table: courses
+Fields:
+- id
+- course_name
+- course_code
+- semester
+- created_at
+
+Table: student_courses
+Fields:
+- id
+- student_id
+- course_id
+
+Table: grades
+Fields:
+- id
+- student_id
+- course_id
+- grade
+- weight
+- grade_type
+- grade_date
+- created_at
+
+Table: class_averages
+Fields:
+- id
+- course_id
+- average_grade
+- average_submission_rate
+- calculation_date
+
+Table: assignments
+Fields:
+- id
+- course_id
+- title
+- description
+- due_date
+- status
+- completed_at
+- created_at
+
+Table: submissions
+Fields:
+- id
+- student_id
+- assignment_id
+- submitted_at
+- status
+
+Table: submission_goals
+Fields:
+- id
+- student_id
+- target_rate
+
+Required Relationships:
+- users.id connects to students.user_id
+- students.id connects to grades.student_id
+- students.id connects to student_courses.student_id
+- students.id connects to submissions.student_id
+- students.id connects to submission_goals.student_id
+- courses.id connects to grades.course_id
+- courses.id connects to assignments.course_id
+- courses.id connects to class_averages.course_id
+- assignments.id connects to submissions.assignment_id
+
+Authentication API Endpoints:
+
+Create or update backend routes:
+
+1. POST /api/auth/signup
+
+Request body:
+{
+  "fullName": "Alex Cohen",
+  "email": "alex@example.com",
+  "password": "123456",
+  "confirmPassword": "123456",
+  "semester": "Semester A"
+}
+
+Behavior:
+- Validate input
+- Check if email already exists
+- Hash password
+- Insert new user into users table
+- Insert linked student into students table
+- Optionally create default demo academic data for the new student
+- Return user and student profile without password_hash
+
+Response example:
+{
+  "success": true,
+  "message": "Account created successfully",
+  "user": {
+    "id": 1,
+    "fullName": "Alex Cohen",
+    "email": "alex@example.com",
+    "role": "student"
+  },
+  "student": {
+    "id": 1,
+    "userId": 1,
+    "fullName": "Alex Cohen",
+    "email": "alex@example.com",
+    "semester": "Semester A"
+  }
+}
+
+2. POST /api/auth/login
+
+Request body:
+{
+  "email": "alex@example.com",
+  "password": "123456"
+}
+
+Behavior:
+- Validate input
+- Find user by email
+- Compare password with password_hash
+- Get linked student profile
+- Return user and student profile without password_hash
+
+Response example:
+{
+  "success": true,
+  "message": "Login successful",
+  "user": {
+    "id": 1,
+    "fullName": "Alex Cohen",
+    "email": "alex@example.com",
+    "role": "student"
+  },
+  "student": {
+    "id": 1,
+    "userId": 1,
+    "fullName": "Alex Cohen",
+    "email": "alex@example.com",
+    "semester": "Semester A"
+  }
+}
+
+3. GET /api/auth/me/:userId
+
+Purpose:
+Used to restore logged-in user after refresh.
+
+Behavior:
+- Receive userId or token depending on implementation
+- Return user and student profile if exists
+- Do not return password_hash
+
+4. POST /api/auth/logout
+
+For this student project, logout can be handled mostly on the frontend by clearing localStorage.
+Still, add a simple endpoint if needed.
+
+Frontend Requirements:
+
+Add pages:
+- LoginPage
+- SignupPage
+
+Add or update components:
+- AuthLayout
+- LoginForm
+- SignupForm
+- ProtectedRoute
+- UserMenu
+- LogoutButton
+
+Routing Requirements:
+Use React Router if it exists.
+
+Public routes:
+- /login
+- /signup
+
+Protected routes:
+- /dashboard
+- /comparison
+- /average-grade
+- /weekly-schedule
+- /submission-rate
+
+If the user is not logged in:
+- Redirect protected routes to /login
+
+If the user is logged in:
+- Redirect /login and /signup to /dashboard
+
+Local Storage:
+Store only safe user data.
+
+Example:
+localStorage.setItem("currentUser", JSON.stringify({
+  userId: user.id,
+  studentId: student.id,
+  fullName: user.fullName,
+  email: user.email,
+  role: user.role
+}))
+
+Important:
+Do not store password or password_hash in localStorage.
+
+Connecting Existing Modules to Logged-In User:
+
+Currently, the app may use a fixed demo student ID such as studentId = 1.
+
+Update the system so all modules use the logged-in student ID instead.
+
+Replace hardcoded student ID with:
+currentUser.studentId
+
+This should affect:
+- Dashboard data
+- Average Grade
+- Class Comparison
+- Weekly Submission Schedule
+- Submission Rate
+
+Example:
+Instead of:
+GET /api/grades/1/averages
+
+Use:
+GET /api/grades/${currentUser.studentId}/averages
+
+Demo User Requirement:
+
+Keep or create a default demo user so the teacher can test the system quickly.
+
+Default demo login:
+Email: demo@student.com
+Password: 123456
+
+Demo user should have:
+- student profile
+- courses
+- grades
+- assignments
+- submissions
+- submission goal
+- class averages
+
+Important:
+If the database is empty, seed this demo user and demo data automatically.
+If the database already has data, do not duplicate demo data.
+
+Signup User Data Requirement:
+
+When a new user signs up, they should not see broken empty pages.
+
+Choose one of these options:
+
+Option A:
+Create empty profile data and show clear empty states:
+- No grades yet
+- No assignments yet
+- No submissions yet
+
+Option B:
+Create sample academic data for every new signed-up student, so the dashboard immediately shows demo analytics.
+
+For this project, prefer Option B because it makes the demo easier.
+When a new student signs up:
+- Enroll the student in the existing courses
+- Add sample grades for that student
+- Add sample submissions
+- Add a default submission target
+- Use existing assignments and courses where possible
+
+Security Requirements:
+- Passwords must be hashed before saving to DB
+- Do not return password_hash to frontend
+- Validate all input
+- Handle duplicate email error
+- Handle incorrect password error
+- Handle missing user/student profile error
+- Use clear error messages
+
+UI/UX Requirements:
+
+Login Page:
+- Clean centered form
+- System title: Smart Learning System
+- Subtitle: Student Analytics Dashboard
+- Email input
+- Password input
+- Login button
+- Link to Signup
+- Optional demo login hint:
+  Demo account: demo@student.com / 123456
+
+Signup Page:
+- Clean centered form
+- Full name input
+- Email input
+- Password input
+- Confirm password input
+- Semester input or dropdown
+- Signup button
+- Link to Login
+- Error and success messages
+
+After Login:
+- Show user name in sidebar/header
+- Add logout button
+- Dashboard should greet the user:
+  “Welcome back, Alex”
+- All module data should belong to the logged-in student
+
+Feedback:
+- Show loading state during login/signup
+- Show error message if login fails
+- Show success message if signup succeeds
+- Do not use browser alert()
+
+Important Rules:
+1. Do not rebuild the entire application.
+2. Do not delete existing modules.
+3. Do not remove existing dashboard, charts, or assignment logic.
+4. Do not hardcode only one user anymore.
+5. Keep existing demo data working.
+6. Add authentication in small, safe changes.
+7. Make sure all imports and routes work.
+8. Make sure the app runs successfully after the update.
+
+Testing Checklist:
+
+After implementing, test the following:
+
+1. Signup with a new email works.
+2. Signup with an existing email shows an error.
+3. Login with correct details works.
+4. Login with wrong password shows an error.
+5. User remains logged in after refresh.
+6. Logout clears the session and redirects to login.
+7. Dashboard uses the logged-in student's data.
+8. Average Grade uses the logged-in student's data.
+9. Weekly Schedule uses the logged-in student's data.
+10. Submission Rate uses the logged-in student's data.
+11. Class Comparison uses the logged-in student's data.
+12. Demo user works:
+   email: demo@student.com
+   password: 123456
+13. Passwords are saved as hashes, not plain text.
+14. Existing system features still work.
+
+Acceptance Criteria:
+
+The improvement is complete only if:
+
+- There is a working Signup page.
+- There is a working Login page.
+- User accounts are stored in SQLite.
+- Passwords are hashed.
+- Each user is connected to a student profile.
+- The system remembers the logged-in user after refresh.
+- Dashboard and modules use the logged-in student ID.
+- There is a working Logout option.
+- Demo user exists and works.
+- No existing module is broken.
+- The project runs successfully in Replit.
+
+Final Instruction:
+Before making changes, inspect the existing files and understand the current structure.
+Then modify only the relevant files.
+This is an improvement to an existing Smart Learning System project, not a new system.
+After finishing, briefly explain which files were changed and how to test login, signup, and the existing modules.

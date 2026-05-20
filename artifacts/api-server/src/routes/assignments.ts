@@ -144,6 +144,10 @@ router.get("/assignments/:studentId/weekly", async (req, res) => {
 router.put("/assignments/:assignmentId/complete", async (req, res) => {
   const { assignmentId } = CompleteAssignmentParams.parse(req.params);
   const { studentId } = CompleteAssignmentBody.parse(req.body);
+  if (studentId !== req.session?.studentId) {
+    res.status(403).json({ error: "Forbidden" });
+    return;
+  }
   const [assignment] = await db.select().from(assignmentsTable).where(eq(assignmentsTable.id, assignmentId));
   if (!assignment) {
     res.status(404).json({ error: "Assignment not found" });

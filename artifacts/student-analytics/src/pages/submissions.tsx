@@ -29,8 +29,10 @@ import {
 } from "recharts";
 import { format, parseISO } from "date-fns";
 
+import { useStudentId } from "@/contexts/auth-context";
+
 export default function Submissions() {
-  const studentId = 1;
+  const studentId = useStudentId();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isGoalOpen, setIsGoalOpen] = useState(false);

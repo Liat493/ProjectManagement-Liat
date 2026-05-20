@@ -36,6 +36,7 @@ import { Badge } from "@/components/ui/badge";
 import { format, parseISO, isSameDay, startOfWeek, addDays } from "date-fns";
 import { useQueryClient } from "@tanstack/react-query";
 import { PageHeader } from "@/components/page-header";
+import { useStudentId } from "@/contexts/auth-context";
 
 type Assignment = {
   id: number;
@@ -65,7 +66,7 @@ const URGENCY_STYLE: Record<string, { badge: string; bar: string; text: string }
 };
 
 export default function Schedule() {
-  const studentId = 1;
+  const studentId = useStudentId();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 

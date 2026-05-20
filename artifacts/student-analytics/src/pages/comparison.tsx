@@ -17,9 +17,10 @@ import {
   ReferenceLine
 } from "recharts";
 import { format, parseISO } from "date-fns";
+import { useStudentId } from "@/contexts/auth-context";
 
 export default function Comparison() {
-  const studentId = 1;
+  const studentId = useStudentId();
   const { data, isLoading, isError } = useGetComparison(studentId, {
     query: { queryKey: getGetComparisonQueryKey(studentId) }
   });

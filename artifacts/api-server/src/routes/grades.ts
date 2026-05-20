@@ -59,6 +59,10 @@ router.get("/grades/:studentId/breakdown/:courseId", async (req, res) => {
 
 router.post("/grades", async (req, res) => {
   const body = AddGradeBody.parse(req.body);
+  if (body.studentId !== req.session?.studentId) {
+    res.status(403).json({ error: "Forbidden" });
+    return;
+  }
   const [student] = await db.select().from(studentsTable).where(eq(studentsTable.id, body.studentId));
   if (!student) { res.status(400).json({ error: "Invalid student" }); return; }
   const [course] = await db.select().from(coursesTable).where(eq(coursesTable.id, body.courseId));

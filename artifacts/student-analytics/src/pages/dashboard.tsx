@@ -20,9 +20,10 @@ import {
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { PageHeader } from "@/components/page-header";
+import { useStudentId } from "@/contexts/auth-context";
 
 export default function Dashboard() {
-  const studentId = 1;
+  const studentId = useStudentId();
   const { data, isLoading, isError } = useGetDashboard(studentId, {
     query: { queryKey: getGetDashboardQueryKey(studentId) },
   });
