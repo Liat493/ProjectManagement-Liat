@@ -8,7 +8,8 @@ import {
 } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, Target, Pencil, AlertTriangle, FileX } from "lucide-react";
+import { AlertCircle, Target, Pencil, AlertTriangle, FileX, ClipboardCheck } from "lucide-react";
+import { PageHeader } from "@/components/page-header";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -110,16 +111,15 @@ export default function Submissions() {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Submission Rates</h1>
-          <p className="text-muted-foreground mt-1">Track your consistency and monitor missed assignments.</p>
-        </div>
-        
-        <Dialog open={isGoalOpen} onOpenChange={setIsGoalOpen}>
-          <Button variant="outline" className="gap-2" onClick={openGoalModal}>
-            <Target size={16} /> Set Goal
-          </Button>
+      <PageHeader
+        title="Submission Rate"
+        description="Monitor your submission habits and compare your rate to your target."
+        icon={ClipboardCheck}
+        actions={
+          <Dialog open={isGoalOpen} onOpenChange={setIsGoalOpen}>
+            <Button variant="outline" className="gap-2" onClick={openGoalModal}>
+              <Target size={16} /> Set Goal
+            </Button>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Update Target Rate</DialogTitle>
@@ -144,7 +144,8 @@ export default function Submissions() {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
+        }
+      />
 
       {rates.alerts.length > 0 && (
         <div className="space-y-3">

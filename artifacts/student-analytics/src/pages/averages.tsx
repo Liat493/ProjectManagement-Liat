@@ -11,7 +11,8 @@ import {
 } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, Plus } from "lucide-react";
+import { AlertCircle, Plus, GraduationCap } from "lucide-react";
+import { PageHeader } from "@/components/page-header";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -131,18 +132,17 @@ export default function Averages() {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Grade Averages</h1>
-          <p className="text-muted-foreground mt-1">Track your performance trajectory and individual course grades.</p>
-        </div>
-        
-        <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-          <DialogTrigger asChild>
-            <Button className="shrink-0 gap-2 shadow-sm">
-              <Plus size={16} /> Add Grade
-            </Button>
-          </DialogTrigger>
+      <PageHeader
+        title="Average Grade"
+        description="Track your course averages, GPA, and grade trends over time."
+        icon={GraduationCap}
+        actions={
+          <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+            <DialogTrigger asChild>
+              <Button className="shrink-0 gap-2 shadow-sm">
+                <Plus size={16} /> Add Grade
+              </Button>
+            </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Record New Grade</DialogTitle>
@@ -219,7 +219,8 @@ export default function Averages() {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
+        }
+      />
 
       <Card className="bg-primary text-primary-foreground shadow-md border-none overflow-hidden relative">
         <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">

@@ -2,7 +2,8 @@ import React from "react";
 import { useGetComparison, getGetComparisonQueryKey } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Users } from "lucide-react";
+import { PageHeader } from "@/components/page-header";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { 
   LineChart, 
@@ -57,10 +58,11 @@ export default function Comparison() {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground tracking-tight">Class Comparison</h1>
-        <p className="text-muted-foreground mt-1">See how your performance compares to the class average.</p>
-      </div>
+      <PageHeader
+        title="Comparison to Class Average"
+        description="Understand how your performance compares to anonymized class data."
+        icon={Users}
+      />
 
       <Card>
         <CardHeader>

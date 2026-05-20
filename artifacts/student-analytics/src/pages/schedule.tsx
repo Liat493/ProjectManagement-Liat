@@ -35,6 +35,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { format, parseISO, isSameDay, startOfWeek, addDays } from "date-fns";
 import { useQueryClient } from "@tanstack/react-query";
+import { PageHeader } from "@/components/page-header";
 
 type Assignment = {
   id: number;
@@ -145,12 +146,11 @@ export default function Schedule() {
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
-      <header>
-        <h1 className="text-3xl font-bold text-foreground tracking-tight">Weekly Schedule</h1>
-        <p className="text-muted-foreground mt-1">
-          Plan your week, prioritize by urgency, and stay ahead of every deadline.
-        </p>
-      </header>
+      <PageHeader
+        title="Weekly Submission Schedule"
+        description="Manage your upcoming assignments, deadlines, and completed tasks."
+        icon={CalendarDays}
+      />
 
       <SummaryCards summary={summary} />
 

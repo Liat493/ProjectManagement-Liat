@@ -1,0 +1,411 @@
+I already have a working Smart Learning System project in Replit.
+
+This is a system-wide improvement task for an existing project.
+Do not rebuild the project from scratch.
+Do not delete existing features.
+Do not change the database structure unless absolutely necessary.
+Do not break existing modules.
+
+Your task is to improve the overall UI/UX consistency, dashboard navigation, readability, and user experience across the entire system.
+
+Project:
+Smart Learning System – Student Analytics Module
+
+Existing Modules:
+- Dashboard
+- Comparison to Class Average
+- Average Grade
+- Weekly Submission Schedule
+- Submission Rate
+
+Main Goal:
+Improve the general design and user experience of the existing system so it looks more professional, consistent, readable, and easy to navigate.
+
+Important:
+First inspect the current project structure and existing components.
+Then update only the relevant files.
+Reuse existing components where possible.
+Create shared reusable UI components if needed.
+
+General System Improvements Required:
+
+1. Improve Design Consistency Across All Modules
+
+Problem:
+The current system screens do not look fully consistent.
+Some modules may use different font sizes, card styles, spacing, button styles, and icons.
+
+Required Change:
+Create a more unified design language across the entire system.
+
+Apply consistent design rules to all modules:
+- Same font family across the app
+- Consistent font sizes for titles, subtitles, card text, labels, and buttons
+- Consistent color palette
+- Consistent card design
+- Consistent border radius
+- Consistent spacing and padding
+- Consistent button style
+- Consistent icon style
+- Consistent table style
+- Consistent status badges
+
+Font Size Requirements:
+- Main page title: large and clear
+- Section titles: medium-large
+- Card numbers/statistics: large and bold
+- Card labels: readable and not too small
+- Table text: readable
+- Buttons: consistent size and text style
+- Avoid very small text inside cards or charts
+
+Suggested UI Rules:
+- Page title: 28px–32px
+- Section title: 20px–24px
+- Card value: 26px–32px
+- Card label: 14px–16px
+- Body text: 15px–16px
+- Button text: 14px–16px
+
+Expected Result:
+All modules should feel like they belong to the same product and not like separate screens built independently.
+
+2. Create or Improve Shared UI Components
+
+Problem:
+Different modules may use different card layouts, buttons, badges, and icons.
+
+Required Change:
+Create reusable shared components and use them across the app.
+
+Create or improve these components if they do not already exist:
+- StatCard
+- DashboardCard
+- ModuleCard
+- AlertCard
+- StatusBadge
+- PrimaryButton
+- SecondaryButton
+- PageHeader
+- SectionHeader
+- NavigationButton
+- EmptyState
+- LoadingState
+- ErrorState
+
+Each component should have consistent styling.
+
+Expected Result:
+The code should be cleaner, and the UI should look more organized and consistent.
+
+3. Improve the Dashboard and Highlight Important Information
+
+Problem:
+The Dashboard currently displays many pieces of information at the same visual level.
+Critical information is not emphasized enough.
+
+Critical information should be more visually noticeable:
+- Overdue assignments
+- Low submission rate
+- Upcoming deadlines
+- Assignments due within 24 hours
+- Courses below class average
+- Weak course performance
+- Any warnings or alerts
+
+Required Change:
+Improve the Dashboard layout so important information is clearly highlighted.
+
+Dashboard should include:
+- Summary cards for each major module
+- Clear alert section at the top or near the top
+- Quick navigation buttons to all modules
+- Highlighted warnings
+- Clear visual hierarchy
+
+Dashboard Summary Cards:
+Add or improve cards for:
+- Overall average grade
+- Submission rate
+- Assignments due this week
+- Overdue assignments
+- Assignments due within 24 hours
+- Class comparison status
+- Weakest course
+- Best course
+
+Dashboard Alert Section:
+Create an alert/warning area that displays important issues, such as:
+- “You have 2 overdue assignments”
+- “Your submission rate is below your target”
+- “You have assignments due within 24 hours”
+- “You are below class average in Mathematics”
+
+Visual Priority:
+- Critical issues should use a stronger visual style
+- Warnings should stand out
+- Positive data should be shown clearly but less aggressively
+- Avoid showing everything with the same color and same importance
+
+Expected Result:
+When a student opens the Dashboard, they should immediately understand what requires attention.
+
+4. Improve Navigation Between Modules
+
+Problem:
+The user should be able to move easily from the Dashboard to each module.
+Currently, navigation between modules may not be clear enough.
+
+Required Change:
+Add direct navigation buttons/cards from the Dashboard to each module.
+
+Dashboard navigation should include buttons or clickable cards for:
+- Go to Weekly Schedule
+- Go to Average Grade
+- Go to Submission Rate
+- Go to Class Comparison
+
+Behavior:
+- Clicking a card or button should navigate to the correct module page.
+- Use React Router navigation if the project uses React Router.
+- Keep navigation consistent with the existing app structure.
+- Navigation buttons should be visually clear and easy to click.
+
+Required Dashboard Quick Actions:
+Add a section called “Quick Actions” or “Explore Modules”.
+
+Include:
+1. Weekly Schedule
+   Text: “View and manage your weekly assignments”
+2. Average Grade
+   Text: “Track your course averages and GPA”
+3. Submission Rate
+   Text: “Analyze your submissions and missed assignments”
+4. Class Comparison
+   Text: “Compare your performance to the class average”
+
+Expected Result:
+The student can move from the Dashboard to any module with one click.
+
+5. Add Clickable Course-Based Navigation
+
+Problem:
+Students should be able to click a course or course-related card and move to the relevant module or filtered view.
+
+Required Change:
+Where course cards or course rows are displayed, make them more interactive when useful.
+
+Behavior:
+- If the Dashboard shows a weak course, clicking it should open the relevant analytics screen.
+- If the Dashboard shows assignments for a course, clicking the course should open Weekly Schedule with that course selected, if possible.
+- If Average Grade shows a course card, clicking it can open the grade breakdown for that course.
+- If Submission Rate shows a course, clicking it can show the course-specific submission details.
+
+Do not overcomplicate this.
+If full filtered navigation is difficult, at least add clear buttons such as:
+- “View Course Assignments”
+- “View Grade Details”
+- “View Submission Details”
+
+Expected Result:
+The system feels connected instead of separate pages.
+
+6. Improve Feedback After User Actions
+
+Problem:
+After actions like “Mark Complete”, the user may not receive clear feedback.
+
+Required Change:
+Add clear feedback messages after important user actions.
+
+Actions that should show feedback:
+- Mark assignment as completed
+- Add new grade
+- Update submission target
+- Apply filter
+- Clear filter
+
+Feedback can be shown as:
+- Toast notification
+- Small success message
+- Inline confirmation
+- Temporary alert box
+
+Examples:
+- “Assignment marked as completed successfully.”
+- “Grade added and averages updated.”
+- “Submission target updated.”
+- “Filter applied.”
+- “All courses are now displayed.”
+
+Rules:
+- Feedback should be short and clear.
+- Success feedback should disappear after a few seconds.
+- Error feedback should be visible and explain what went wrong.
+- Do not use browser alert().
+- Use a styled UI message instead.
+
+Expected Result:
+Students understand that their action worked and the system feels more reliable.
+
+7. Use Consistent Icons Across the System
+
+Problem:
+Icons may be missing, inconsistent, or from different styles.
+
+Required Change:
+Use one consistent icon library across the entire app.
+
+Recommended:
+Use lucide-react if available.
+
+Apply icons consistently for:
+- Dashboard
+- Grades
+- Assignments
+- Calendar
+- Submission Rate
+- Class Comparison
+- Alerts
+- Warnings
+- Success
+- Completed assignments
+- Filters
+- Navigation buttons
+
+Examples:
+- Dashboard: LayoutDashboard
+- Weekly Schedule: CalendarDays
+- Average Grade: GraduationCap or BarChart
+- Submission Rate: ClipboardCheck
+- Class Comparison: Users or TrendingUp
+- Alerts: AlertTriangle
+- Completed: CheckCircle
+- Filter: Filter
+- Course: BookOpen
+
+Expected Result:
+The system looks cleaner and more professional.
+
+8. Improve Page Headers and Module Introductions
+
+Problem:
+Some pages may not clearly explain what the module does.
+
+Required Change:
+Each module page should have a consistent header.
+
+Each page header should include:
+- Module title
+- Short explanation sentence
+- Optional icon
+- Optional quick statistic
+
+Examples:
+Weekly Submission Schedule:
+Title: Weekly Submission Schedule
+Description: Manage your upcoming assignments, deadlines, and completed tasks.
+
+Average Grade:
+Title: Average Grade
+Description: Track your course averages, GPA, and grade trends over time.
+
+Submission Rate:
+Title: Submission Rate
+Description: Monitor your submission habits and compare your rate to your target.
+
+Class Comparison:
+Title: Comparison to Class Average
+Description: Understand how your performance compares to anonymized class data.
+
+Expected Result:
+Each screen is easier to understand immediately.
+
+9. Improve Responsive Layout
+
+Problem:
+The system should look good on different screen sizes.
+
+Required Change:
+Improve responsive behavior.
+
+Requirements:
+- Dashboard cards should wrap properly on smaller screens.
+- Tables should be scrollable if needed.
+- Buttons should not overflow.
+- Calendar view should remain readable.
+- Module cards should stack on mobile.
+- Text should not be cut off.
+
+Expected Result:
+The app remains usable on laptop screens and smaller displays.
+
+10. Preserve Existing Functionality
+
+Very Important:
+Do not remove existing logic.
+Do not break existing API calls.
+Do not remove existing database data.
+Do not change working features unless needed for UI/UX improvement.
+
+After improvements, make sure these still work:
+- Dashboard loads correctly
+- Average Grade page loads correctly
+- Adding a grade still works
+- Weekly Schedule page loads correctly
+- Mark Complete still works
+- Course filtering still works if already implemented
+- Calendar View still works if already implemented
+- Submission Rate page loads correctly
+- Updating target submission rate still works
+- Class Comparison page loads correctly
+- Charts still display data
+
+Acceptance Criteria:
+
+The improvement task is complete only if:
+
+1. All modules use consistent font sizes.
+2. Cards across the system have a consistent style.
+3. Buttons across the system have a consistent style.
+4. Icons are consistent and professional.
+5. Dashboard includes clear quick navigation to all modules.
+6. Dashboard highlights critical information more strongly.
+7. Overdue assignments and low submission rates are visually emphasized.
+8. User receives clear feedback after important actions.
+9. Each module has a clear page header and description.
+10. Navigation from Dashboard to other modules works with one click.
+11. The UI remains responsive.
+12. Existing features continue working after the update.
+13. The app runs without import errors or route errors.
+
+Implementation Instructions:
+
+Step 1:
+Inspect the existing code structure.
+
+Step 2:
+Identify shared layout and component files.
+
+Step 3:
+Create or update shared UI components.
+
+Step 4:
+Update Dashboard design and navigation.
+
+Step 5:
+Update module pages to use the same headers, cards, buttons, badges, spacing, and icons.
+
+Step 6:
+Add feedback messages for important user actions.
+
+Step 7:
+Test the full app.
+
+Step 8:
+Briefly explain what files were changed and how to test the improvements.
+
+Final Reminder:
+This is not a new project.
+This is an improvement task for an existing Smart Learning System project.
+Modify only the relevant existing files and keep all existing features working.
