@@ -362,6 +362,9 @@ components:
         - urgency
         - isOverdue
         - hoursUntilDue
+        - completedAt
+        - daysLate
+        - isDueWithin24Hours
       properties:
         id: { type: integer }
         title: { type: string }
@@ -373,6 +376,9 @@ components:
         urgency: { type: string }
         isOverdue: { type: boolean }
         hoursUntilDue: { type: number }
+        completedAt: { type: ["string", "null"] }
+        daysLate: { type: integer }
+        isDueWithin24Hours: { type: boolean }
     AssignmentCompleteInput:
       type: object
       required: [studentId]

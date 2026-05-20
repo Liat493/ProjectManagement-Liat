@@ -118,6 +118,10 @@ export interface WeeklyAssignment {
   urgency: string;
   isOverdue: boolean;
   hoursUntilDue: number;
+  /** @nullable */
+  completedAt: string | null;
+  daysLate: number;
+  isDueWithin24Hours: boolean;
 }
 
 export interface AssignmentCompleteInput {

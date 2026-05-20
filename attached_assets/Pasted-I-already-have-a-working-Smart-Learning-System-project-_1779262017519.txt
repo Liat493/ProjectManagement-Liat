@@ -1,0 +1,305 @@
+I already have a working Smart Learning System project in Replit.
+
+I want you to improve ONLY the Weekly Submission Schedule module.
+Do not rebuild the entire project from scratch.
+Do not delete existing features.
+Do not change unrelated modules such as Average Grade, Comparison to Class Average, or Submission Rate unless it is required for integration.
+
+Your task is to upgrade the Weekly Submission Schedule feature according to the requirements below.
+
+Module Name:
+Weekly Submission Schedule
+
+Main Goal:
+Improve the weekly assignment management screen so students can better organize, filter, prioritize, track, and manage their weekly assignments.
+
+Current Situation:
+The system currently displays assignments mainly as a list.
+There is a “Mark Complete” button, and the system shows some distinction between past due and upcoming assignments.
+However, the module is missing several important behaviors from the Sprint 2 user stories.
+
+Required Improvements:
+
+1. Add Course Filtering
+
+Problem:
+The current Weekly Schedule screen does not allow students to filter assignments by a specific course.
+
+Required Change:
+Add a course filter using a dropdown/select component.
+
+Behavior:
+- The dropdown should include:
+  - All Courses
+  - Each course from the database
+- When the student selects a course, only assignments from that course should be displayed.
+- When “All Courses” is selected, all weekly assignments should be displayed.
+- The filter should work in both List View and Calendar View.
+- The selected filter should update the UI immediately without refreshing the page.
+
+Backend:
+If needed, update the API endpoint to support an optional courseId query parameter.
+
+Example:
+GET /api/assignments/:studentId/weekly?courseId=1
+
+Frontend:
+Add a dropdown at the top of the Weekly Schedule page.
+
+Expected Result:
+Students can focus on assignments from one course at a time.
+
+2. Add Calendar View
+
+Problem:
+Assignments are currently displayed only as a list.
+
+Required Change:
+Add a Calendar View option for the Weekly Submission Schedule.
+
+Behavior:
+- Add a toggle or tabs:
+  - List View
+  - Calendar View
+- Calendar View should show the current week.
+- Assignments should be grouped by day.
+- Each day should display the assignments due on that date.
+- Each assignment card inside the calendar should show:
+  - Assignment title
+  - Course name
+  - Due time/date
+  - Status
+  - Urgency label
+- Calendar View should respect the selected course filter.
+- Calendar View should clearly show empty days with a message such as “No assignments”.
+
+Design:
+Use a simple weekly calendar layout with 7 columns or 7 day sections.
+Make it readable and responsive.
+
+Expected Result:
+Students can visually manage their weekly schedule instead of only seeing a list.
+
+3. Improve Assignment Prioritization by Urgency
+
+Problem:
+The current separation into “Past Due” and “Upcoming” is not enough.
+Students need automatic prioritization by the closest due date.
+
+Required Change:
+Sort assignments automatically by due date.
+
+Behavior:
+- Assignments should be ordered from the closest due date to the farthest due date.
+- Overdue assignments should appear first.
+- Assignments due today should appear before assignments due later this week.
+- Assignments due tomorrow should appear before assignments due in several days.
+- Completed assignments can be moved to the bottom or visually separated.
+
+Add urgency labels:
+- Overdue
+- Due Today
+- Due Tomorrow
+- Due Soon
+- Upcoming
+- Completed
+
+Urgency Logic:
+- If assignment is completed: Completed
+- If due date is before today and not completed: Overdue
+- If due date is today: Due Today
+- If due date is tomorrow: Due Tomorrow
+- If due date is within 2-3 days: Due Soon
+- If due date is later this week: Upcoming
+
+Expected Result:
+The student can immediately understand what needs attention first.
+
+4. Add Deadline Reminder System
+
+Problem:
+The system does not currently provide reminders before assignment deadlines.
+
+Required Change:
+Add reminder indicators for assignments that are close to the deadline.
+
+Behavior:
+- If an assignment is due within 24 hours and is not completed, display a reminder.
+- The reminder can appear as:
+  - A warning badge
+  - An alert card at the top of the page
+  - A notification-style message near the assignment
+- Example text:
+  “Reminder: This assignment is due within 24 hours.”
+- Do not show reminders for completed assignments.
+- Do not show reminders for assignments with distant deadlines.
+
+Optional:
+Add a reminder summary box at the top:
+“You have X assignments due within 24 hours.”
+
+Expected Result:
+Students are warned before important deadlines and are less likely to miss submissions.
+
+5. Improve Visibility of Overdue Assignments
+
+Problem:
+Overdue assignments exist in the UI, but they are not visually strong enough.
+
+Required Change:
+Make overdue assignments more noticeable.
+
+Behavior:
+- Overdue assignments should have a clear visual style.
+- Add strong labels such as:
+  - OVERDUE
+  - Action Required
+- Use a noticeable border, background, or badge.
+- Show how many days late the assignment is.
+- Example:
+  “Overdue by 2 days”
+- Overdue assignments should appear at the top of the list unless completed.
+
+Expected Result:
+Students can immediately identify missed or late assignments and take action.
+
+6. Improve Weekly Assignment Organization
+
+Problem:
+The weekly assignment screen needs a clearer and more organized structure.
+
+Required Change:
+Reorganize the page layout to help students plan their time better.
+
+Suggested Layout:
+At the top of the page, add summary cards:
+- Total assignments this week
+- Completed assignments
+- Due within 24 hours
+- Overdue assignments
+
+Below that, add:
+- Course filter dropdown
+- View toggle: List View / Calendar View
+- Assignment list or calendar content
+
+In List View, organize assignments using sections:
+- Overdue
+- Due Today
+- Due Tomorrow
+- Later This Week
+- Completed
+
+Each assignment card should include:
+- Assignment title
+- Course name
+- Due date
+- Status
+- Urgency label
+- Reminder label when relevant
+- Mark Complete button when not completed
+
+Expected Result:
+The page should feel like a real weekly planning dashboard, not only a simple list.
+
+7. Improve Completed Assignment Tracking
+
+Problem:
+The system has a “Mark Complete” button, but after marking an assignment as completed, there is no clear visual difference between completed and incomplete assignments.
+
+Required Change:
+Improve how completed assignments are displayed.
+
+Behavior:
+- After clicking “Mark Complete”, the assignment should immediately change visually.
+- Completed assignments should show:
+  - Completed badge
+  - Different style
+  - Optional strikethrough on title
+  - Disabled or hidden “Mark Complete” button
+- Completed assignments should remain completed after page refresh.
+- Completed assignments should not show overdue warnings or deadline reminders.
+- Completed assignments should be grouped separately or moved to the bottom.
+
+Backend:
+Make sure the completion status is saved in the database.
+
+API:
+Use or create endpoint:
+PUT /api/assignments/:assignmentId/complete
+
+Expected Result:
+Students can clearly track what they have already completed.
+
+Technical Requirements:
+
+Backend:
+- Keep using the existing database.
+- Do not remove existing assignment data.
+- If needed, add fields to the assignments table:
+  - completed_at
+  - reminder_enabled
+- Update the assignment API to return:
+  - assignment id
+  - title
+  - description
+  - course id
+  - course name
+  - due date
+  - status
+  - completed_at
+  - urgency label
+  - isOverdue
+  - isDueWithin24Hours
+  - daysLate
+- Make sure all date calculations are correct.
+- Handle errors properly.
+
+Frontend:
+- Update only the Weekly Schedule page and related components.
+- Create or update reusable components:
+  - CourseFilter
+  - ViewToggle
+  - AssignmentCard
+  - AssignmentListView
+  - AssignmentCalendarView
+  - WeeklySummaryCards
+  - ReminderAlert
+- Use clean, readable UI.
+- Keep the design consistent with the rest of the app.
+- Make the page responsive.
+
+Important Rules:
+1. Do not delete existing project files unless necessary.
+2. Do not rewrite the whole app.
+3. Do not break other pages.
+4. Keep the existing database connection.
+5. Keep existing seed data, but add more assignments if needed to demonstrate:
+   - overdue assignment
+   - due today assignment
+   - due tomorrow assignment
+   - due later this week assignment
+   - completed assignment
+6. Make sure the app runs successfully after changes.
+7. Fix any import errors or route errors.
+8. Test the Weekly Schedule page after the update.
+
+Acceptance Criteria:
+
+The update is complete only if all of these work:
+
+1. Student can filter weekly assignments by course.
+2. Student can switch between List View and Calendar View.
+3. Assignments are sorted by urgency and due date.
+4. Assignments due within 24 hours show reminders.
+5. Overdue assignments are visually clear and appear at the top.
+6. Weekly summary cards display correct numbers.
+7. Completed assignments look clearly different from incomplete assignments.
+8. Mark Complete updates the UI immediately.
+9. Completion status remains saved after page refresh.
+10. Calendar View groups assignments by day.
+11. Course filter works in both List View and Calendar View.
+12. Other modules in the system continue working.
+
+Now update the existing project code according to these requirements.
+After making the changes, explain briefly which files you changed and how to run/test the updated Weekly Submission Schedule module.

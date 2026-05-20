@@ -33,7 +33,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </div>
             <div>
               <h2 className="font-semibold text-foreground leading-none mb-1">Alex Cohen</h2>
-              <span className="text-xs text-muted-foreground font-medium">Fall 2024</span>
+              <span className="text-xs text-muted-foreground font-medium">Spring 2026</span>
             </div>
           </div>
         </div>

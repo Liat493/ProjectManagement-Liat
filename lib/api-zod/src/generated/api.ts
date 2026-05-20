@@ -140,7 +140,10 @@ export const GetWeeklyAssignmentsResponseItem = zod.object({
   "status": zod.string(),
   "urgency": zod.string(),
   "isOverdue": zod.boolean(),
-  "hoursUntilDue": zod.number()
+  "hoursUntilDue": zod.number(),
+  "completedAt": zod.string().nullable(),
+  "daysLate": zod.number(),
+  "isDueWithin24Hours": zod.boolean()
 })
 export const GetWeeklyAssignmentsResponse = zod.array(GetWeeklyAssignmentsResponseItem)
 
@@ -163,7 +166,10 @@ export const CompleteAssignmentResponse = zod.object({
   "status": zod.string(),
   "urgency": zod.string(),
   "isOverdue": zod.boolean(),
-  "hoursUntilDue": zod.number()
+  "hoursUntilDue": zod.number(),
+  "completedAt": zod.string().nullable(),
+  "daysLate": zod.number(),
+  "isDueWithin24Hours": zod.boolean()
 })
 
 
