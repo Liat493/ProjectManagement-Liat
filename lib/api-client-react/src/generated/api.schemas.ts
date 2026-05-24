@@ -180,3 +180,10 @@ export interface SubmissionGoalInput {
   targetRate: number;
 }
 
+export type GetAveragesParams = {
+/**
+ * Filter averages to a single semester. Defaults to all semesters.
+ */
+semester?: string;
+};
+

@@ -14,11 +14,33 @@ const router: IRouter = Router();
 
 router.get("/grades/:studentId/averages", async (req, res) => {
   const { studentId } = GetAveragesParams.parse(req.params);
+  const semesterFilter = typeof req.query["semester"] === "string" ? req.query["semester"] : null;
+
   const enrollments = await db.select().from(studentCoursesTable).where(eq(studentCoursesTable.studentId, studentId));
-  const courseIds = enrollments.map((e) => e.courseId);
-  const courses = courseIds.length ? await db.select().from(coursesTable).where(inArray(coursesTable.id, courseIds)) : [];
+  const enrolledCourseIds = enrollments.map((e) => e.courseId);
+  const allCourses = enrolledCourseIds.length
+    ? await db.select().from(coursesTable).where(inArray(coursesTable.id, enrolledCourseIds))
+    : [];
+
+  // Full semester list (across all of the student's enrollments) — used to
+  // populate the semester selector regardless of which semester is currently
+  // being viewed. Sorted for stable UI ordering.
+  const semesters = Array.from(new Set(allCourses.map((c) => c.semester))).sort();
+
+  // Apply the (optional) semester filter to the course set used for the
+  // averages/trend/breakdown payload. Default = all courses (preserves the
+  // previous behaviour for clients that don't pass a semester).
+  const courses = semesterFilter
+    ? allCourses.filter((c) => c.semester === semesterFilter)
+    : allCourses;
+  const courseIds = courses.map((c) => c.id);
+
   const grades = courseIds.length
-    ? await db.select().from(gradesTable).where(and(eq(gradesTable.studentId, studentId), inArray(gradesTable.courseId, courseIds))).orderBy(asc(gradesTable.gradeDate))
+    ? await db
+        .select()
+        .from(gradesTable)
+        .where(and(eq(gradesTable.studentId, studentId), inArray(gradesTable.courseId, courseIds)))
+        .orderBy(asc(gradesTable.gradeDate))
     : [];
 
   const overall = weightedAverage(grades);
@@ -33,7 +55,6 @@ router.get("/grades/:studentId/averages", async (req, res) => {
   });
   const dates = Array.from(new Set(grades.map((g) => g.gradeDate))).sort();
   const trend = dates.map((d) => ({ date: d, average: weightedAverage(grades.filter((g) => g.gradeDate <= d)) ?? 0 }));
-  const semesters = Array.from(new Set(courses.map((c) => c.semester)));
 
   res.json(GetAveragesResponse.parse({ overall, perCourse, trend, semesters }));
 });

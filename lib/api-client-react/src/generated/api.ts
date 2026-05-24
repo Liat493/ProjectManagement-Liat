@@ -25,6 +25,7 @@ import type {
   ComparisonReport,
   Course,
   DashboardSummary,
+  GetAveragesParams,
   Grade,
   GradeBreakdown,
   GradeInput,
@@ -338,17 +339,26 @@ export function useGetComparison<TData = Awaited<ReturnType<typeof getComparison
 
 
 
-export const getGetAveragesUrl = (studentId: number,) => {
+export const getGetAveragesUrl = (studentId: number,
+    params?: GetAveragesParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-  return `/api/grades/${studentId}/averages`
+  return stringifiedParams.length > 0 ? `/api/grades/${studentId}/averages?${stringifiedParams}` : `/api/grades/${studentId}/averages`
 }
 
-export const getAverages = async (studentId: number, options?: RequestInit): Promise<AveragesReport> => {
+export const getAverages = async (studentId: number,
+    params?: GetAveragesParams, options?: RequestInit): Promise<AveragesReport> => {
 
-  return customFetch<AveragesReport>(getGetAveragesUrl(studentId),
+  return customFetch<AveragesReport>(getGetAveragesUrl(studentId,params),
   {
     ...options,
     method: 'GET'
@@ -361,23 +371,25 @@ export const getAverages = async (studentId: number, options?: RequestInit): Pro
 
 
 
-export const getGetAveragesQueryKey = (studentId: number,) => {
+export const getGetAveragesQueryKey = (studentId: number,
+    params?: GetAveragesParams,) => {
     return [
-    `/api/grades/${studentId}/averages`
+    `/api/grades/${studentId}/averages`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getGetAveragesQueryOptions = <TData = Awaited<ReturnType<typeof getAverages>>, TError = ErrorType<unknown>>(studentId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAverages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export const getGetAveragesQueryOptions = <TData = Awaited<ReturnType<typeof getAverages>>, TError = ErrorType<unknown>>(studentId: number,
+    params?: GetAveragesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAverages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetAveragesQueryKey(studentId);
+  const queryKey =  queryOptions?.queryKey ?? getGetAveragesQueryKey(studentId,params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAverages>>> = ({ signal }) => getAverages(studentId, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAverages>>> = ({ signal }) => getAverages(studentId,params, { signal, ...requestOptions });
 
 
 
@@ -392,11 +404,12 @@ export type GetAveragesQueryError = ErrorType<unknown>
 
 
 export function useGetAverages<TData = Awaited<ReturnType<typeof getAverages>>, TError = ErrorType<unknown>>(
- studentId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAverages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+ studentId: number,
+    params?: GetAveragesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAverages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
-  const queryOptions = getGetAveragesQueryOptions(studentId,options)
+  const queryOptions = getGetAveragesQueryOptions(studentId,params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

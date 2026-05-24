@@ -47,16 +47,26 @@ type GradeFormValues = z.infer<typeof gradeSchema>;
 
 import { useStudentId } from "@/contexts/auth-context";
 
+const ALL_SEMESTERS = "__all__";
+
 export default function Averages() {
   const studentId = useStudentId();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
+  const [selectedSemester, setSelectedSemester] = useState<string>(ALL_SEMESTERS);
 
-  const { data: averagesData, isLoading: isLoadingAverages } = useGetAverages(studentId, {
-    query: { queryKey: getGetAveragesQueryKey(studentId) }
-  });
+  // Send `semester` to the API only when a specific one is selected.
+  // Omitting the param preserves the original "all semesters" behaviour.
+  const averagesParams =
+    selectedSemester === ALL_SEMESTERS ? undefined : { semester: selectedSemester };
+
+  const { data: averagesData, isLoading: isLoadingAverages } = useGetAverages(
+    studentId,
+    averagesParams,
+    { query: { queryKey: getGetAveragesQueryKey(studentId, averagesParams) } },
+  );
 
   const { data: coursesData } = useGetStudentCourses(studentId, {
     query: { queryKey: ['studentCourses', studentId] }
@@ -224,6 +234,25 @@ export default function Averages() {
         }
       />
 
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <Label htmlFor="semester-select" className="text-sm text-muted-foreground">Semester</Label>
+          <div className="mt-1">
+            <Select value={selectedSemester} onValueChange={setSelectedSemester}>
+              <SelectTrigger id="semester-select" className="w-[240px]">
+                <SelectValue placeholder="All semesters" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ALL_SEMESTERS}>All semesters</SelectItem>
+                {averagesData.semesters.map((s) => (
+                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+
       <Card className="bg-primary text-primary-foreground shadow-md border-none overflow-hidden relative">
         <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
           <svg width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
@@ -237,7 +266,7 @@ export default function Averages() {
             <span className="text-2xl text-primary-foreground/70 font-semibold">%</span>
           </div>
           <div className="mt-4 inline-flex items-center rounded-full bg-black/20 px-3 py-1 text-sm font-medium text-primary-foreground backdrop-blur-sm">
-            Across {averagesData.perCourse.length} courses • {averagesData.semesters[0]}
+            Across {averagesData.perCourse.length} courses • {selectedSemester === ALL_SEMESTERS ? "All semesters" : selectedSemester}
           </div>
         </CardContent>
       </Card>

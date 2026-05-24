@@ -55,32 +55,48 @@ async function seedSampleAcademicData(studentId: number) {
     return d;
   };
 
-  const gradeRows = courses.flatMap((c, i) => [
-    {
-      studentId,
-      courseId: c.id,
-      grade: 78 + ((i * 3) % 15),
-      weight: 20,
-      gradeType: "Quiz",
-      gradeDate: isoDate(daysAgo(35)),
-    },
-    {
-      studentId,
-      courseId: c.id,
-      grade: 80 + ((i * 5) % 15),
-      weight: 30,
-      gradeType: "Assignment",
-      gradeDate: isoDate(daysAgo(20)),
-    },
-    {
-      studentId,
-      courseId: c.id,
-      grade: 82 + ((i * 4) % 13),
-      weight: 50,
-      gradeType: "Midterm",
-      gradeDate: isoDate(daysAgo(10)),
-    },
-  ]);
+  // Fixed date triples per historical semester so the trend chart looks
+  // realistic for each term. Any unknown semester falls back to dates
+  // relative to today (the original behaviour).
+  const semesterDates: Record<string, [string, string, string]> = {
+    "Semester A 2024": ["2024-03-05", "2024-04-10", "2024-05-12"],
+    "Semester B 2024": ["2024-10-04", "2024-11-08", "2024-12-10"],
+    "Semester A 2025": ["2025-03-06", "2025-04-10", "2025-05-14"],
+  };
+
+  const gradeRows = courses.flatMap((c, i) => {
+    const dates = semesterDates[c.semester] ?? [
+      isoDate(daysAgo(35)),
+      isoDate(daysAgo(20)),
+      isoDate(daysAgo(10)),
+    ];
+    return [
+      {
+        studentId,
+        courseId: c.id,
+        grade: 78 + ((i * 3) % 15),
+        weight: 20,
+        gradeType: "Quiz",
+        gradeDate: dates[0],
+      },
+      {
+        studentId,
+        courseId: c.id,
+        grade: 80 + ((i * 5) % 15),
+        weight: 30,
+        gradeType: "Assignment",
+        gradeDate: dates[1],
+      },
+      {
+        studentId,
+        courseId: c.id,
+        grade: 82 + ((i * 4) % 13),
+        weight: 50,
+        gradeType: "Midterm",
+        gradeDate: dates[2],
+      },
+    ];
+  });
   if (gradeRows.length) await db.insert(gradesTable).values(gradeRows);
 
   // Mark all currently-past assignments as submitted for a clean starting state

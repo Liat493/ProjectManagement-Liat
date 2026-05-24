@@ -76,6 +76,10 @@ export const GetAveragesParams = zod.object({
   "studentId": zod.coerce.number()
 })
 
+export const GetAveragesQueryParams = zod.object({
+  "semester": zod.coerce.string().optional().describe('Filter averages to a single semester. Defaults to all semesters.')
+})
+
 export const GetAveragesResponse = zod.object({
   "overall": zod.number().nullable(),
   "perCourse": zod.array(zod.object({

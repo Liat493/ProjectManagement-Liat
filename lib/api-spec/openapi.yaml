@@ -82,6 +82,11 @@ paths:
           name: studentId
           required: true
           schema: { type: integer }
+        - in: query
+          name: semester
+          required: false
+          schema: { type: string }
+          description: Filter averages to a single semester. Defaults to all semesters.
       responses:
         "200":
           description: Averages
