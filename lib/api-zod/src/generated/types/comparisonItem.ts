@@ -5,6 +5,7 @@
  * Smart Learning System - Student Analytics API
  * OpenAPI spec version: 0.1.0
  */
+import type { ComparisonTrendPoint } from './comparisonTrendPoint';
 
 export interface ComparisonItem {
   courseId: number;
@@ -15,4 +16,5 @@ export interface ComparisonItem {
   /** @nullable */
   difference: number | null;
   status: string;
+  trend: ComparisonTrendPoint[];
 }

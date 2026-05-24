@@ -24,6 +24,7 @@ export default function Comparison() {
   const { data, isLoading, isError } = useGetComparison(studentId, {
     query: { queryKey: getGetComparisonQueryKey(studentId) }
   });
+  const [selectedCourseId, setSelectedCourseId] = React.useState<number | null>(null);
 
   if (isLoading) {
     return (
@@ -48,6 +49,9 @@ export default function Comparison() {
   }
 
   const { items, trend } = data;
+  const selectedCourse = selectedCourseId
+    ? items.find((i) => i.courseId === selectedCourseId) ?? null
+    : null;
 
   const formatTrendDate = (dateStr: string) => {
     try {
@@ -128,6 +132,97 @@ export default function Comparison() {
         </CardContent>
       </Card>
 
+      <Card>
+        <CardHeader>
+          <CardTitle>Compare a Specific Course</CardTitle>
+          <CardDescription>Select a course to see your performance vs the class average over time</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2 mb-4">
+            {items.map((item) => {
+              const isSelected = item.courseId === selectedCourseId;
+              return (
+                <button
+                  key={item.courseId}
+                  type="button"
+                  onClick={() => setSelectedCourseId(isSelected ? null : item.courseId)}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                    isSelected
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-background hover:bg-muted border-border"
+                  }`}
+                >
+                  {item.courseName}
+                </button>
+              );
+            })}
+          </div>
+
+          {selectedCourse ? (
+            <>
+              <h3 className="text-lg font-semibold mb-2">
+                {selectedCourse.courseName} - Your Performance vs Class Average
+              </h3>
+              {selectedCourse.trend.length > 0 ? (
+                <div className="h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={selectedCourse.trend} margin={{ top: 5, right: 20, left: -20, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                      <XAxis
+                        dataKey="date"
+                        tickFormatter={formatTrendDate}
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                        dy={10}
+                      />
+                      <YAxis
+                        domain={['dataMin - 5', 100]}
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--card))',
+                          borderColor: 'hsl(var(--border))',
+                          borderRadius: '8px',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+                        }}
+                        labelFormatter={formatTrendDate}
+                      />
+                      <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontSize: '14px', fontWeight: 500 }} />
+                      <Line
+                        name="You"
+                        type="monotone"
+                        dataKey="studentAverage"
+                        stroke="hsl(var(--primary))"
+                        strokeWidth={3}
+                        dot={{ r: 4, fill: 'hsl(var(--primary))' }}
+                        activeDot={{ r: 6 }}
+                      />
+                      <Line
+                        name="Class Average"
+                        type="monotone"
+                        dataKey="classAverage"
+                        stroke="hsl(var(--muted-foreground))"
+                        strokeWidth={2}
+                        strokeDasharray="5 5"
+                        dot={false}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No grades recorded yet for this course.</p>
+              )}
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground">Select a course above to view its dedicated comparison graph.</p>
+          )}
+        </CardContent>
+      </Card>
+
       <div>
         <h2 className="text-xl font-semibold mb-4">Course Breakdown</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -142,8 +237,15 @@ export default function Comparison() {
             if (item.status === "Above") statusColor = "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300";
             if (item.status === "Below") statusColor = "bg-destructive/10 text-destructive";
 
+            const isSelected = item.courseId === selectedCourseId;
+
             return (
-              <Card key={item.courseId} className="overflow-hidden">
+              <Card
+                key={item.courseId}
+                onClick={() => setSelectedCourseId(isSelected ? null : item.courseId)}
+                className={`overflow-hidden cursor-pointer transition-shadow ${
+                  isSelected ? "ring-2 ring-primary" : "hover:shadow-md"
+                }`}>
                 <CardContent className="p-0">
                   <div className="p-6">
                     <div className="flex justify-between items-start mb-4">

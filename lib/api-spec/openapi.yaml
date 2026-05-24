@@ -259,6 +259,7 @@ components:
         - classAverage
         - difference
         - status
+        - trend
       properties:
         courseId: { type: integer }
         courseName: { type: string }
@@ -266,6 +267,9 @@ components:
         classAverage: { type: number }
         difference: { type: ["number", "null"] }
         status: { type: string }
+        trend:
+          type: array
+          items: { $ref: "#/components/schemas/ComparisonTrendPoint" }
     ComparisonTrendPoint:
       type: object
       required: [date, studentAverage, classAverage]

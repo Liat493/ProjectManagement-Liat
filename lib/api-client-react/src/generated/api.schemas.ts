@@ -31,6 +31,12 @@ export interface DashboardSummary {
   alerts: string[];
 }
 
+export interface ComparisonTrendPoint {
+  date: string;
+  studentAverage: number;
+  classAverage: number;
+}
+
 export interface ComparisonItem {
   courseId: number;
   courseName: string;
@@ -40,12 +46,7 @@ export interface ComparisonItem {
   /** @nullable */
   difference: number | null;
   status: string;
-}
-
-export interface ComparisonTrendPoint {
-  date: string;
-  studentAverage: number;
-  classAverage: number;
+  trend: ComparisonTrendPoint[];
 }
 
 export interface ComparisonReport {

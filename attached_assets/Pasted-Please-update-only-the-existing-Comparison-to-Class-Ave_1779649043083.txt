@@ -1,0 +1,61 @@
+Please update only the existing "Comparison to Class Average" feature.
+
+Important:
+Do not remove, replace, redesign, or change any existing components that already work.
+Keep the current page structure, existing graph, Course Breakdown cards, colors, labels, layout, spacing, typography, and styling.
+Only add or adjust the specific items listed below.
+Do not add any extra features that are not mentioned in these requirements.
+Do not change unrelated pages, components, routing, data models, or existing working functionality.
+
+The current implementation already answers several requirements, so the goal is only to complete the missing or partially supported requirements.
+
+Required changes:
+
+1. Add specific course selection
+
+Current issue:
+The system currently shows Course Breakdown cards, but the student cannot actively select a specific course and view a dedicated comparison graph for that course.
+
+Please add a course selection option using the existing courses from the Course Breakdown section.
+
+The student should be able to select one course, for example:
+- Calculus II
+- Introduction to Psychology
+- Data Structures
+- World History
+
+After selecting a course, the system should display a graph for that selected course only.
+
+The selected course graph must compare:
+- The student’s performance in that course
+- The class average in that course
+
+The graph title should clearly show the selected course name, for example:
+"Calculus II - Your Performance vs Class Average"
+
+Keep the existing Course Breakdown cards visible. Do not remove them.
+If possible, visually indicate which course is currently selected, but do not change the overall design.
+
+This is needed to support the requirement:
+"As a student, I want comparison per course, so that I can analyze specific subjects."
+
+2. Improve comparison over time
+
+Current issue:
+The current Performance Trend graph shows student performance over time, but the Class Average appears to be static or not clearly represented as a real trend over time.
+
+Please improve the graph so it clearly shows two time-based trend lines:
+- Student performance over time
+- Class average performance over time
+
+Both lines should use the same dates/time points, so the student can clearly compare improvement relative to the class over time.
+
+Do not replace the existing graph design. Only make sure the Class Average is represented as a real trend over time, not only as a single static average line.
+
+This is needed to fully support the requirement:
+"As a student, I want comparison over time, so that I can track improvement relative to others."
+
+Final instruction:
+Only implement the two changes above.
+Do not add new unrelated analytics, filters, charts, pages, buttons, summaries, recommendations, or design changes.
+The goal is requirement coverage only, not UI polishing.

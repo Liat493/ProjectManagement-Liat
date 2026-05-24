@@ -57,7 +57,12 @@ export const GetComparisonResponse = zod.object({
   "studentAverage": zod.number().nullable(),
   "classAverage": zod.number(),
   "difference": zod.number().nullable(),
-  "status": zod.string()
+  "status": zod.string(),
+  "trend": zod.array(zod.object({
+  "date": zod.string(),
+  "studentAverage": zod.number(),
+  "classAverage": zod.number()
+}))
 })),
   "trend": zod.array(zod.object({
   "date": zod.string(),
