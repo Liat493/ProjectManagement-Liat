@@ -5,8 +5,6 @@ import {
   useUpdateSubmissionGoal,
   useGetMissedAssignments,
   getGetMissedAssignmentsQueryKey,
-  useGetStudentCourses,
-  getGetStudentCoursesQueryKey
 } from "@workspace/api-client-react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -37,6 +35,21 @@ import { useStudentId } from "@/contexts/auth-context";
 
 const ALL_COURSES = "__all__";
 
+// Fixed course options for the Submission Rate course filter.
+// IDs correspond to the seeded `courses` table rows.
+const COURSE_OPTIONS: Array<{ id: number; name: string }> = [
+  { id: 1, name: "Calculus II" },
+  { id: 2, name: "Introduction to Psychology" },
+  { id: 3, name: "Data Structures" },
+  { id: 4, name: "World History" },
+  { id: 5, name: "Linear Algebra" },
+  { id: 6, name: "English Literature" },
+  { id: 7, name: "Introduction to Programming" },
+  { id: 8, name: "Microeconomics" },
+  { id: 9, name: "Statistics" },
+  { id: 10, name: "Philosophy of Mind" },
+];
+
 export default function Submissions() {
   const studentId = useStudentId();
   const { toast } = useToast();
@@ -44,12 +57,6 @@ export default function Submissions() {
   const [isGoalOpen, setIsGoalOpen] = useState(false);
   const [newGoal, setNewGoal] = useState<string>("");
   const [selectedCourseId, setSelectedCourseId] = useState<string>(ALL_COURSES);
-
-  // Load the student's enrolled courses to populate the filter dropdown.
-  // Uses the existing endpoint already consumed elsewhere in the app.
-  const { data: coursesData } = useGetStudentCourses(studentId, {
-    query: { queryKey: getGetStudentCoursesQueryKey(studentId) }
-  });
 
   // Send `courseId` to the API only when a specific course is selected.
   // Omitting the param preserves the existing "all courses" behaviour.
@@ -177,13 +184,18 @@ export default function Submissions() {
           <Label htmlFor="course-filter" className="text-sm text-muted-foreground">Course</Label>
           <div className="mt-1">
             <Select value={selectedCourseId} onValueChange={setSelectedCourseId}>
-              <SelectTrigger id="course-filter" className="w-[260px]">
+              <SelectTrigger
+                id="course-filter"
+                aria-label="Filter by course"
+                data-testid="course-filter"
+                className="w-[260px] bg-background"
+              >
                 <SelectValue placeholder="All Courses" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value={ALL_COURSES}>All Courses</SelectItem>
-                {coursesData?.map((c) => (
-                  <SelectItem key={c.id} value={String(c.id)}>{c.courseName}</SelectItem>
+                {COURSE_OPTIONS.map((c) => (
+                  <SelectItem key={c.id} value={String(c.id)}>{c.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
