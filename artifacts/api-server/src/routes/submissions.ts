@@ -3,6 +3,7 @@ import { db, assignmentsTable, coursesTable, studentCoursesTable, submissionsTab
 import { eq, and, inArray, asc } from "drizzle-orm";
 import {
   GetSubmissionRateParams,
+  GetSubmissionRateQueryParams,
   GetSubmissionRateResponse,
   GetMissedAssignmentsParams,
   GetMissedAssignmentsResponse,
@@ -14,9 +15,21 @@ import { rateLabel, round2 } from "../lib/business";
 
 const router: IRouter = Router();
 
-async function computeRate(studentId: number) {
+async function computeRate(studentId: number, courseIdFilter?: number) {
   const enrollments = await db.select().from(studentCoursesTable).where(eq(studentCoursesTable.studentId, studentId));
-  const courseIds = enrollments.map((e) => e.courseId);
+  const allCourseIds = enrollments.map((e) => e.courseId);
+  // When a course filter is provided, restrict to that single course.
+  // If the student is not enrolled in it, `courseIds` becomes empty so
+  // the report contains zeroed/empty metrics rather than silently
+  // falling back to all courses (strict filter semantics, matches the
+  // semester-filter pattern in /grades). When omitted, behaviour is
+  // unchanged.
+  let courseIds: number[];
+  if (courseIdFilter !== undefined) {
+    courseIds = allCourseIds.includes(courseIdFilter) ? [courseIdFilter] : [];
+  } else {
+    courseIds = allCourseIds;
+  }
   const courses = courseIds.length ? await db.select().from(coursesTable).where(inArray(coursesTable.id, courseIds)) : [];
   const assignments = courseIds.length
     ? await db.select().from(assignmentsTable).where(inArray(assignmentsTable.courseId, courseIds)).orderBy(asc(assignmentsTable.dueDate))
@@ -92,7 +105,8 @@ async function computeRate(studentId: number) {
 
 router.get("/submissions/:studentId/rate", async (req, res) => {
   const { studentId } = GetSubmissionRateParams.parse(req.params);
-  const payload = await computeRate(studentId);
+  const { courseId } = GetSubmissionRateQueryParams.parse(req.query);
+  const payload = await computeRate(studentId, courseId);
   res.json(GetSubmissionRateResponse.parse(payload));
 });
 

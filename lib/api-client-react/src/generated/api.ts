@@ -26,6 +26,7 @@ import type {
   Course,
   DashboardSummary,
   GetAveragesParams,
+  GetSubmissionRateParams,
   Grade,
   GradeBreakdown,
   GradeInput,
@@ -700,17 +701,26 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getCompleteAssignmentMutationOptions(options));
     }
 
-export const getGetSubmissionRateUrl = (studentId: number,) => {
+export const getGetSubmissionRateUrl = (studentId: number,
+    params?: GetSubmissionRateParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-  return `/api/submissions/${studentId}/rate`
+  return stringifiedParams.length > 0 ? `/api/submissions/${studentId}/rate?${stringifiedParams}` : `/api/submissions/${studentId}/rate`
 }
 
-export const getSubmissionRate = async (studentId: number, options?: RequestInit): Promise<SubmissionRateReport> => {
+export const getSubmissionRate = async (studentId: number,
+    params?: GetSubmissionRateParams, options?: RequestInit): Promise<SubmissionRateReport> => {
 
-  return customFetch<SubmissionRateReport>(getGetSubmissionRateUrl(studentId),
+  return customFetch<SubmissionRateReport>(getGetSubmissionRateUrl(studentId,params),
   {
     ...options,
     method: 'GET'
@@ -723,23 +733,25 @@ export const getSubmissionRate = async (studentId: number, options?: RequestInit
 
 
 
-export const getGetSubmissionRateQueryKey = (studentId: number,) => {
+export const getGetSubmissionRateQueryKey = (studentId: number,
+    params?: GetSubmissionRateParams,) => {
     return [
-    `/api/submissions/${studentId}/rate`
+    `/api/submissions/${studentId}/rate`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getGetSubmissionRateQueryOptions = <TData = Awaited<ReturnType<typeof getSubmissionRate>>, TError = ErrorType<unknown>>(studentId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSubmissionRate>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export const getGetSubmissionRateQueryOptions = <TData = Awaited<ReturnType<typeof getSubmissionRate>>, TError = ErrorType<unknown>>(studentId: number,
+    params?: GetSubmissionRateParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSubmissionRate>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetSubmissionRateQueryKey(studentId);
+  const queryKey =  queryOptions?.queryKey ?? getGetSubmissionRateQueryKey(studentId,params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSubmissionRate>>> = ({ signal }) => getSubmissionRate(studentId, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSubmissionRate>>> = ({ signal }) => getSubmissionRate(studentId,params, { signal, ...requestOptions });
 
 
 
@@ -754,11 +766,12 @@ export type GetSubmissionRateQueryError = ErrorType<unknown>
 
 
 export function useGetSubmissionRate<TData = Awaited<ReturnType<typeof getSubmissionRate>>, TError = ErrorType<unknown>>(
- studentId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSubmissionRate>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+ studentId: number,
+    params?: GetSubmissionRateParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSubmissionRate>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
-  const queryOptions = getGetSubmissionRateQueryOptions(studentId,options)
+  const queryOptions = getGetSubmissionRateQueryOptions(studentId,params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

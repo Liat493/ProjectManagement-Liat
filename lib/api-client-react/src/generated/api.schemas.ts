@@ -187,3 +187,10 @@ export type GetAveragesParams = {
 semester?: string;
 };
 
+export type GetSubmissionRateParams = {
+/**
+ * Filter the submission rate to a single course. Defaults to all courses.
+ */
+courseId?: number;
+};
+

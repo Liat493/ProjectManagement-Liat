@@ -173,6 +173,11 @@ paths:
           name: studentId
           required: true
           schema: { type: integer }
+        - in: query
+          name: courseId
+          required: false
+          description: Filter the submission rate to a single course. Defaults to all courses.
+          schema: { type: integer }
       responses:
         "200":
           description: Submission rate report

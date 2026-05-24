@@ -4,8 +4,12 @@ import {
   getGetSubmissionRateQueryKey,
   useUpdateSubmissionGoal,
   useGetMissedAssignments,
-  getGetMissedAssignmentsQueryKey
+  getGetMissedAssignmentsQueryKey,
+  useGetStudentCourses,
+  getGetStudentCoursesQueryKey
 } from "@workspace/api-client-react";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle, Target, Pencil, AlertTriangle, FileX, ClipboardCheck } from "lucide-react";
@@ -31,16 +35,34 @@ import { format, parseISO } from "date-fns";
 
 import { useStudentId } from "@/contexts/auth-context";
 
+const ALL_COURSES = "__all__";
+
 export default function Submissions() {
   const studentId = useStudentId();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isGoalOpen, setIsGoalOpen] = useState(false);
   const [newGoal, setNewGoal] = useState<string>("");
+  const [selectedCourseId, setSelectedCourseId] = useState<string>(ALL_COURSES);
 
-  const { data: rates, isLoading: isLoadingRates, isError: isErrorRates } = useGetSubmissionRate(studentId, {
-    query: { queryKey: getGetSubmissionRateQueryKey(studentId) }
+  // Load the student's enrolled courses to populate the filter dropdown.
+  // Uses the existing endpoint already consumed elsewhere in the app.
+  const { data: coursesData } = useGetStudentCourses(studentId, {
+    query: { queryKey: getGetStudentCoursesQueryKey(studentId) }
   });
+
+  // Send `courseId` to the API only when a specific course is selected.
+  // Omitting the param preserves the existing "all courses" behaviour.
+  const rateParams =
+    selectedCourseId === ALL_COURSES
+      ? undefined
+      : { courseId: Number(selectedCourseId) };
+
+  const { data: rates, isLoading: isLoadingRates, isError: isErrorRates } = useGetSubmissionRate(
+    studentId,
+    rateParams,
+    { query: { queryKey: getGetSubmissionRateQueryKey(studentId, rateParams) } },
+  );
 
   const { data: missed, isLoading: isLoadingMissed } = useGetMissedAssignments(studentId, {
     query: { queryKey: getGetMissedAssignmentsQueryKey(studentId) }
@@ -51,6 +73,7 @@ export default function Submissions() {
       onSuccess: () => {
         toast({ title: "Goal Updated", description: "Your submission goal has been updated." });
         setIsGoalOpen(false);
+        // Invalidate every variant of the submission-rate query (any course filter)
         queryClient.invalidateQueries({ queryKey: getGetSubmissionRateQueryKey(studentId) });
       },
       onError: () => {
@@ -148,6 +171,25 @@ export default function Submissions() {
         </Dialog>
         }
       />
+
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <Label htmlFor="course-filter" className="text-sm text-muted-foreground">Course</Label>
+          <div className="mt-1">
+            <Select value={selectedCourseId} onValueChange={setSelectedCourseId}>
+              <SelectTrigger id="course-filter" className="w-[260px]">
+                <SelectValue placeholder="All Courses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ALL_COURSES}>All Courses</SelectItem>
+                {coursesData?.map((c) => (
+                  <SelectItem key={c.id} value={String(c.id)}>{c.courseName}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
 
       {rates.alerts.length > 0 && (
         <div className="space-y-3">

@@ -186,6 +186,10 @@ export const GetSubmissionRateParams = zod.object({
   "studentId": zod.coerce.number()
 })
 
+export const GetSubmissionRateQueryParams = zod.object({
+  "courseId": zod.coerce.number().optional().describe('Filter the submission rate to a single course. Defaults to all courses.')
+})
+
 export const GetSubmissionRateResponse = zod.object({
   "overall": zod.number(),
   "total": zod.number(),

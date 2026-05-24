@@ -16,6 +16,7 @@ export * from './courseAverage';
 export * from './courseSubmissionRate';
 export * from './dashboardSummary';
 export * from './getAveragesParams';
+export * from './getSubmissionRateParams';
 export * from './grade';
 export * from './gradeBreakdown';
 export * from './gradeInput';
