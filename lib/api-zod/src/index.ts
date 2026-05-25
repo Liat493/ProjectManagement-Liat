@@ -15,8 +15,9 @@ export type { CourseSubmissionRate } from "./generated/types/courseSubmissionRat
 export type { DashboardSummary } from "./generated/types/dashboardSummary";
 export type { Grade } from "./generated/types/grade";
 export type { GradeBreakdown } from "./generated/types/gradeBreakdown";
-export type { GradeInput } from "./generated/types/gradeInput";
 export type { HealthStatus } from "./generated/types/healthStatus";
+export type { AttendanceReport } from "./generated/types/attendanceReport";
+export type { AttendanceCourse } from "./generated/types/attendanceCourse";
 export type { MissedAssignment } from "./generated/types/missedAssignment";
 export type { SubmissionGoal } from "./generated/types/submissionGoal";
 export type { SubmissionGoalInput } from "./generated/types/submissionGoalInput";

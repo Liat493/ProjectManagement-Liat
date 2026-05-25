@@ -6,14 +6,13 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface CourseAverage {
+export interface AttendanceCourse {
   courseId: number;
   courseName: string;
-  /** @nullable */
-  average: number | null;
-  gradeCount: number;
-  /** @nullable */
-  finalGrade: number | null;
-  /** @nullable */
-  letterGrade: string | null;
+  totalSessions: number;
+  attended: number;
+  absent: number;
+  late: number;
+  excused: number;
+  rate: number;
 }

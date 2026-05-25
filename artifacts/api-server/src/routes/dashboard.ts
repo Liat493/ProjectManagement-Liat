@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { db, gradesTable, coursesTable, studentCoursesTable, studentsTable, assignmentsTable, submissionsTable, classAveragesTable, submissionGoalsTable } from "@workspace/db";
+import { db, gradesTable, coursesTable, studentCoursesTable, studentsTable, assignmentsTable, submissionsTable, classAveragesTable, submissionGoalsTable, attendanceRecordsTable } from "@workspace/db";
 import { eq, and, inArray, gte, lte } from "drizzle-orm";
 import { GetDashboardParams, GetDashboardResponse } from "@workspace/api-zod";
 import { weightedAverage, round2 } from "../lib/business";
@@ -73,8 +73,22 @@ router.get("/dashboard/:studentId", async (req, res) => {
     else classComparisonSummary = `Close to class average (${avgDiff >= 0 ? "+" : ""}${avgDiff.toFixed(1)})`;
   }
 
+  // attendance summary (excused records excluded from denominator)
+  const attendanceRecords = courseIds.length
+    ? await db
+        .select()
+        .from(attendanceRecordsTable)
+        .where(and(eq(attendanceRecordsTable.studentId, studentId), inArray(attendanceRecordsTable.courseId, courseIds)))
+    : [];
+  const counted = attendanceRecords.filter((r) => r.status !== "excused");
+  const present = counted.filter((r) => r.status === "present" || r.status === "late").length;
+  const attendanceRate = counted.length ? round2((present / counted.length) * 100) : 0;
+
   // alerts
   const alerts: string[] = [];
+  if (counted.length > 0 && attendanceRate < 75) {
+    alerts.push(`Attendance is ${attendanceRate}% — below 75%`);
+  }
   const [goal] = await db.select().from(submissionGoalsTable).where(eq(submissionGoalsTable.studentId, studentId));
   const target = goal?.targetRate ?? 90;
   if (submissionRate < 60) alerts.push(`Submission rate is critical: ${submissionRate}%`);
@@ -102,6 +116,7 @@ router.get("/dashboard/:studentId", async (req, res) => {
     dueThisWeek,
     overdueCount,
     classComparisonSummary,
+    attendanceRate,
     alerts,
   });
   res.json(payload);

@@ -14,6 +14,7 @@ tags:
   - name: assignments
   - name: submissions
   - name: courses
+  - name: attendance
 paths:
   /healthz:
     get:
@@ -112,21 +113,21 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/GradeBreakdown" }
-  /grades:
-    post:
-      operationId: addGrade
-      tags: [grades]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/GradeInput" }
+  /attendance/{studentId}:
+    get:
+      operationId: getAttendance
+      tags: [attendance]
+      parameters:
+        - in: path
+          name: studentId
+          required: true
+          schema: { type: integer }
       responses:
-        "201":
-          description: Created
+        "200":
+          description: Attendance summary
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Grade" }
+              schema: { $ref: "#/components/schemas/AttendanceReport" }
   /assignments/{studentId}/weekly:
     get:
       operationId: getWeeklyAssignments
@@ -247,6 +248,7 @@ components:
         - dueThisWeek
         - overdueCount
         - classComparisonSummary
+        - attendanceRate
         - alerts
       properties:
         studentName: { type: string }
@@ -257,6 +259,7 @@ components:
         dueThisWeek: { type: integer }
         overdueCount: { type: integer }
         classComparisonSummary: { type: string }
+        attendanceRate: { type: number }
         alerts:
           type: array
           items: { type: string }
@@ -299,12 +302,14 @@ components:
           items: { $ref: "#/components/schemas/ComparisonTrendPoint" }
     CourseAverage:
       type: object
-      required: [courseId, courseName, average, gradeCount]
+      required: [courseId, courseName, average, gradeCount, finalGrade, letterGrade]
       properties:
         courseId: { type: integer }
         courseName: { type: string }
         average: { type: ["number", "null"] }
         gradeCount: { type: integer }
+        finalGrade: { type: ["number", "null"] }
+        letterGrade: { type: ["string", "null"] }
     TrendPoint:
       type: object
       required: [date, average]
@@ -353,16 +358,46 @@ components:
         grades:
           type: array
           items: { $ref: "#/components/schemas/Grade" }
-    GradeInput:
+    AttendanceCourse:
       type: object
-      required: [studentId, courseId, grade, weight, gradeType, gradeDate]
+      required:
+        - courseId
+        - courseName
+        - totalSessions
+        - attended
+        - absent
+        - late
+        - excused
+        - rate
       properties:
-        studentId: { type: integer }
         courseId: { type: integer }
-        grade: { type: number, minimum: 0, maximum: 100 }
-        weight: { type: number, minimum: 0 }
-        gradeType: { type: string, minLength: 1 }
-        gradeDate: { type: string }
+        courseName: { type: string }
+        totalSessions: { type: integer }
+        attended: { type: integer }
+        absent: { type: integer }
+        late: { type: integer }
+        excused: { type: integer }
+        rate: { type: number }
+    AttendanceReport:
+      type: object
+      required:
+        - overall
+        - totalSessions
+        - attended
+        - status
+        - perCourse
+        - alerts
+      properties:
+        overall: { type: number }
+        totalSessions: { type: integer }
+        attended: { type: integer }
+        status: { type: string }
+        perCourse:
+          type: array
+          items: { $ref: "#/components/schemas/AttendanceCourse" }
+        alerts:
+          type: array
+          items: { type: string }
     WeeklyAssignment:
       type: object
       required:

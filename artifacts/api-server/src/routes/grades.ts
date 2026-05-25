@@ -1,12 +1,11 @@
 import { Router, type IRouter } from "express";
-import { db, gradesTable, coursesTable, studentCoursesTable, studentsTable } from "@workspace/db";
+import { db, gradesTable, coursesTable, studentCoursesTable, courseFinalGradesTable } from "@workspace/db";
 import { eq, and, inArray, asc } from "drizzle-orm";
 import {
   GetAveragesParams,
   GetAveragesResponse,
   GetGradeBreakdownParams,
   GetGradeBreakdownResponse,
-  AddGradeBody,
 } from "@workspace/api-zod";
 import { weightedAverage } from "../lib/business";
 
@@ -44,13 +43,31 @@ router.get("/grades/:studentId/averages", async (req, res) => {
     : [];
 
   const overall = weightedAverage(grades);
+
+  // Final-grade snapshots, if recorded for any of the in-scope courses.
+  const finals = courseIds.length
+    ? await db
+        .select()
+        .from(courseFinalGradesTable)
+        .where(
+          and(
+            eq(courseFinalGradesTable.studentId, studentId),
+            inArray(courseFinalGradesTable.courseId, courseIds),
+          ),
+        )
+    : [];
+  const finalByCourse = new Map(finals.map((f) => [f.courseId, f]));
+
   const perCourse = courses.map((c) => {
     const cgs = grades.filter((g) => g.courseId === c.id);
+    const fin = finalByCourse.get(c.id);
     return {
       courseId: c.id,
       courseName: c.courseName,
       average: weightedAverage(cgs),
       gradeCount: cgs.length,
+      finalGrade: fin?.finalGrade ?? null,
+      letterGrade: fin?.letterGrade ?? null,
     };
   });
   const dates = Array.from(new Set(grades.map((g) => g.gradeDate))).sort();
@@ -78,25 +95,8 @@ router.get("/grades/:studentId/breakdown/:courseId", async (req, res) => {
   );
 });
 
-router.post("/grades", async (req, res) => {
-  const body = AddGradeBody.parse(req.body);
-  if (body.studentId !== req.session?.studentId) {
-    res.status(403).json({ error: "Forbidden" });
-    return;
-  }
-  const [student] = await db.select().from(studentsTable).where(eq(studentsTable.id, body.studentId));
-  if (!student) { res.status(400).json({ error: "Invalid student" }); return; }
-  const [course] = await db.select().from(coursesTable).where(eq(coursesTable.id, body.courseId));
-  if (!course) { res.status(400).json({ error: "Invalid course" }); return; }
-  const [created] = await db.insert(gradesTable).values({
-    studentId: body.studentId,
-    courseId: body.courseId,
-    grade: body.grade,
-    weight: body.weight,
-    gradeType: body.gradeType,
-    gradeDate: body.gradeDate,
-  }).returning();
-  res.status(201).json(created);
-});
+// NOTE: grade write endpoints intentionally removed — this is a student-side
+// dashboard. Grades are seeded/managed directly in the Demo DB and the
+// dashboard recomputes everything dynamically on refresh.
 
 export default router;

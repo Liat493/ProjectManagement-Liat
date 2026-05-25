@@ -28,6 +28,7 @@ export interface DashboardSummary {
   dueThisWeek: number;
   overdueCount: number;
   classComparisonSummary: string;
+  attendanceRate: number;
   alerts: string[];
 }
 
@@ -60,6 +61,10 @@ export interface CourseAverage {
   /** @nullable */
   average: number | null;
   gradeCount: number;
+  /** @nullable */
+  finalGrade: number | null;
+  /** @nullable */
+  letterGrade: string | null;
 }
 
 export interface TrendPoint {
@@ -93,19 +98,24 @@ export interface GradeBreakdown {
   grades: Grade[];
 }
 
-export interface GradeInput {
-  studentId: number;
+export interface AttendanceCourse {
   courseId: number;
-  /**
-     * @minimum 0
-     * @maximum 100
-     */
-  grade: number;
-  /** @minimum 0 */
-  weight: number;
-  /** @minLength 1 */
-  gradeType: string;
-  gradeDate: string;
+  courseName: string;
+  totalSessions: number;
+  attended: number;
+  absent: number;
+  late: number;
+  excused: number;
+  rate: number;
+}
+
+export interface AttendanceReport {
+  overall: number;
+  totalSessions: number;
+  attended: number;
+  status: string;
+  perCourse: AttendanceCourse[];
+  alerts: string[];
 }
 
 export interface WeeklyAssignment {

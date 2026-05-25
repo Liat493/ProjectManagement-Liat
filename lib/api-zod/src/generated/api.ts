@@ -29,6 +29,7 @@ export const GetDashboardResponse = zod.object({
   "dueThisWeek": zod.number(),
   "overdueCount": zod.number(),
   "classComparisonSummary": zod.string(),
+  "attendanceRate": zod.number(),
   "alerts": zod.array(zod.string())
 })
 
@@ -86,7 +87,9 @@ export const GetAveragesResponse = zod.object({
   "courseId": zod.number(),
   "courseName": zod.string(),
   "average": zod.number().nullable(),
-  "gradeCount": zod.number()
+  "gradeCount": zod.number(),
+  "finalGrade": zod.number().nullable(),
+  "letterGrade": zod.string().nullable()
 })),
   "trend": zod.array(zod.object({
   "date": zod.string(),
@@ -117,21 +120,26 @@ export const GetGradeBreakdownResponse = zod.object({
 })
 
 
-export const addGradeBodyGradeMin = 0;
-export const addGradeBodyGradeMax = 100;
+export const GetAttendanceParams = zod.object({
+  "studentId": zod.coerce.number()
+})
 
-export const addGradeBodyWeightMin = 0;
-
-
-
-
-export const AddGradeBody = zod.object({
-  "studentId": zod.number(),
+export const GetAttendanceResponse = zod.object({
+  "overall": zod.number(),
+  "totalSessions": zod.number(),
+  "attended": zod.number(),
+  "status": zod.string(),
+  "perCourse": zod.array(zod.object({
   "courseId": zod.number(),
-  "grade": zod.number().min(addGradeBodyGradeMin).max(addGradeBodyGradeMax),
-  "weight": zod.number().min(addGradeBodyWeightMin),
-  "gradeType": zod.string().min(1),
-  "gradeDate": zod.string()
+  "courseName": zod.string(),
+  "totalSessions": zod.number(),
+  "attended": zod.number(),
+  "absent": zod.number(),
+  "late": zod.number(),
+  "excused": zod.number(),
+  "rate": zod.number()
+})),
+  "alerts": zod.array(zod.string())
 })
 
 

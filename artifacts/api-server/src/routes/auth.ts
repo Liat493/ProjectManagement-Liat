@@ -12,6 +12,8 @@ import {
   assignmentsTable,
   submissionsTable,
   submissionGoalsTable,
+  attendanceRecordsTable,
+  courseFinalGradesTable,
 } from "@workspace/db";
 import { sanitizeUser, sanitizeStudent } from "../lib/auth";
 
@@ -98,6 +100,45 @@ async function seedSampleAcademicData(studentId: number) {
     ];
   });
   if (gradeRows.length) await db.insert(gradesTable).values(gradeRows);
+
+  // Attendance: seed ~20 sessions per course with mostly-present status so
+  // every new student starts with a realistic attendance picture. The
+  // pattern is deterministic but varies per course so per-course rates
+  // aren't all identical.
+  const attendanceStatuses = ["present", "present", "present", "present", "late", "absent"];
+  const attendanceRows = courses.flatMap((c, i) =>
+    Array.from({ length: 20 }).map((_, j) => {
+      const sessionDate = isoDate(daysAgo(120 - j * 5));
+      // shift the pattern per course so each course has a unique mix
+      const status = attendanceStatuses[(i + j) % attendanceStatuses.length]!;
+      return { studentId, courseId: c.id, sessionDate, status };
+    }),
+  );
+  if (attendanceRows.length) await db.insert(attendanceRecordsTable).values(attendanceRows);
+
+  // Final-grade snapshots for any course in a past semester. Current-term
+  // courses get no snapshot — their "final" is still in progress and is
+  // computed dynamically by the averages endpoint.
+  const currentSemesters = new Set(["Spring 2026"]);
+  const finalRows = courses
+    .filter((c) => !currentSemesters.has(c.semester))
+    .map((c, i) => {
+      const finalGrade = 78 + ((i * 3) % 18); // 78-95
+      const letter =
+        finalGrade >= 93
+          ? "A"
+          : finalGrade >= 90
+            ? "A-"
+            : finalGrade >= 87
+              ? "B+"
+              : finalGrade >= 83
+                ? "B"
+                : finalGrade >= 80
+                  ? "B-"
+                  : "C+";
+      return { studentId, courseId: c.id, finalGrade, letterGrade: letter, term: c.semester };
+    });
+  if (finalRows.length) await db.insert(courseFinalGradesTable).values(finalRows);
 
   // Mark all currently-past assignments as submitted for a clean starting state
   const allAssignments = await db.select().from(assignmentsTable);

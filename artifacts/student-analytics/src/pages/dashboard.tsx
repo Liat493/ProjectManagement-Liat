@@ -17,6 +17,7 @@ import {
   ClipboardCheck,
   Users,
   ArrowRight,
+  UserCheck,
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { PageHeader } from "@/components/page-header";
@@ -61,8 +62,24 @@ export default function Dashboard() {
     dueThisWeek,
     overdueCount,
     classComparisonSummary,
+    attendanceRate,
     alerts,
   } = data;
+
+  const attendanceSubtitle =
+    attendanceRate >= 95
+      ? "Excellent attendance"
+      : attendanceRate >= 85
+        ? "Good attendance"
+        : attendanceRate >= 75
+          ? "Needs improvement"
+          : "Below 75% — critical";
+  const attendanceTone =
+    attendanceRate >= 85
+      ? "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400"
+      : attendanceRate >= 75
+        ? "bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-500"
+        : "bg-destructive/10 text-destructive";
 
   // Split alerts: anything mentioning overdue/missed/below/critical is critical
   const criticalRe = /(overdue|missed|below|critical|past due)/i;
@@ -103,7 +120,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         <StatCard
           href="/averages"
           label="Overall Average"
@@ -119,6 +136,15 @@ export default function Dashboard() {
           icon={Target}
           iconTone="bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400"
           subtitle="Across all courses"
+        />
+        <StatCard
+          href="/averages"
+          label="Attendance"
+          value={`${attendanceRate.toFixed(0)}%`}
+          icon={UserCheck}
+          iconTone={attendanceTone}
+          subtitle={attendanceSubtitle}
+          highlight={attendanceRate > 0 && attendanceRate < 75}
         />
         <StatCard
           href="/schedule"

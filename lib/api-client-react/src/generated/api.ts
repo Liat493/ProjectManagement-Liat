@@ -21,15 +21,14 @@ import type {
 
 import type {
   AssignmentCompleteInput,
+  AttendanceReport,
   AveragesReport,
   ComparisonReport,
   Course,
   DashboardSummary,
   GetAveragesParams,
   GetSubmissionRateParams,
-  Grade,
   GradeBreakdown,
-  GradeInput,
   HealthStatus,
   MissedAssignment,
   SubmissionGoal,
@@ -499,70 +498,76 @@ export function useGetGradeBreakdown<TData = Awaited<ReturnType<typeof getGradeB
 
 
 
-export const getAddGradeUrl = () => {
+export const getGetAttendanceUrl = (studentId: number,) => {
 
 
 
 
-  return `/api/grades`
+  return `/api/attendance/${studentId}`
 }
 
-export const addGrade = async (gradeInput: GradeInput, options?: RequestInit): Promise<Grade> => {
+export const getAttendance = async (studentId: number, options?: RequestInit): Promise<AttendanceReport> => {
 
-  return customFetch<Grade>(getAddGradeUrl(),
+  return customFetch<AttendanceReport>(getGetAttendanceUrl(studentId),
   {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      gradeInput,)
+    method: 'GET'
+
+
   }
 );}
 
 
 
 
-export const getAddGradeMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addGrade>>, TError,{data: BodyType<GradeInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof addGrade>>, TError,{data: BodyType<GradeInput>}, TContext> => {
 
-const mutationKey = ['addGrade'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addGrade>>, {data: BodyType<GradeInput>}> = (props) => {
-          const {data} = props ?? {};
-
-          return  addGrade(data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type AddGradeMutationResult = NonNullable<Awaited<ReturnType<typeof addGrade>>>
-    export type AddGradeMutationBody = BodyType<GradeInput>
-    export type AddGradeMutationError = ErrorType<unknown>
-
-    export const useAddGrade = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addGrade>>, TError,{data: BodyType<GradeInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
- ): UseMutationResult<
-        Awaited<ReturnType<typeof addGrade>>,
-        TError,
-        {data: BodyType<GradeInput>},
-        TContext
-      > => {
-      return useMutation(getAddGradeMutationOptions(options));
+export const getGetAttendanceQueryKey = (studentId: number,) => {
+    return [
+    `/api/attendance/${studentId}`
+    ] as const;
     }
+
+
+export const getGetAttendanceQueryOptions = <TData = Awaited<ReturnType<typeof getAttendance>>, TError = ErrorType<unknown>>(studentId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAttendance>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAttendanceQueryKey(studentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAttendance>>> = ({ signal }) => getAttendance(studentId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(studentId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAttendance>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAttendanceQueryResult = NonNullable<Awaited<ReturnType<typeof getAttendance>>>
+export type GetAttendanceQueryError = ErrorType<unknown>
+
+
+
+export function useGetAttendance<TData = Awaited<ReturnType<typeof getAttendance>>, TError = ErrorType<unknown>>(
+ studentId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAttendance>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAttendanceQueryOptions(studentId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export const getGetWeeklyAssignmentsUrl = (studentId: number,) => {
 

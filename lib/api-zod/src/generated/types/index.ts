@@ -7,6 +7,8 @@
  */
 
 export * from './assignmentCompleteInput';
+export * from './attendanceCourse';
+export * from './attendanceReport';
 export * from './averagesReport';
 export * from './comparisonItem';
 export * from './comparisonReport';
@@ -19,7 +21,6 @@ export * from './getAveragesParams';
 export * from './getSubmissionRateParams';
 export * from './grade';
 export * from './gradeBreakdown';
-export * from './gradeInput';
 export * from './healthStatus';
 export * from './missedAssignment';
 export * from './submissionGoal';

@@ -18,5 +18,6 @@ export interface DashboardSummary {
   dueThisWeek: number;
   overdueCount: number;
   classComparisonSummary: string;
+  attendanceRate: number;
   alerts: string[];
 }

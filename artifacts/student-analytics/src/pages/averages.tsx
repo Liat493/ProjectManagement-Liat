@@ -1,49 +1,27 @@
 import React, { useState } from "react";
-import { 
-  useGetAverages, 
+import {
+  useGetAverages,
   getGetAveragesQueryKey,
-  useGetStudentCourses,
-  useAddGrade,
   useGetGradeBreakdown,
   getGetGradeBreakdownQueryKey,
-  getGetDashboardQueryKey,
-  getGetComparisonQueryKey
 } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, Plus, GraduationCap } from "lucide-react";
+import { GraduationCap } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useForm, Controller } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useToast } from "@/hooks/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
-import { 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer 
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
 } from "recharts";
 import { format, parseISO } from "date-fns";
-
-const gradeSchema = z.object({
-  courseId: z.coerce.number().min(1, "Course is required"),
-  grade: z.coerce.number().min(0).max(100, "Grade must be between 0 and 100"),
-  weight: z.coerce.number().min(0.1, "Weight must be greater than 0"),
-  gradeType: z.string().min(1, "Grade type is required"),
-  gradeDate: z.string().min(1, "Date is required"),
-});
-
-type GradeFormValues = z.infer<typeof gradeSchema>;
 
 import { useStudentId } from "@/contexts/auth-context";
 
@@ -51,9 +29,6 @@ const ALL_SEMESTERS = "__all__";
 
 export default function Averages() {
   const studentId = useStudentId();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [isAddOpen, setIsAddOpen] = useState(false);
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
   const [selectedSemester, setSelectedSemester] = useState<string>(ALL_SEMESTERS);
 
@@ -68,56 +43,11 @@ export default function Averages() {
     { query: { queryKey: getGetAveragesQueryKey(studentId, averagesParams) } },
   );
 
-  const { data: coursesData } = useGetStudentCourses(studentId, {
-    query: { queryKey: ['studentCourses', studentId] }
-  });
-
   const { data: breakdownData, isLoading: isLoadingBreakdown } = useGetGradeBreakdown(
-    studentId, 
-    selectedCourseId || 0, 
-    { query: { enabled: !!selectedCourseId, queryKey: getGetGradeBreakdownQueryKey(studentId, selectedCourseId || 0) } }
+    studentId,
+    selectedCourseId || 0,
+    { query: { enabled: !!selectedCourseId, queryKey: getGetGradeBreakdownQueryKey(studentId, selectedCourseId || 0) } },
   );
-
-  const addGradeMutation = useAddGrade({
-    mutation: {
-      onSuccess: () => {
-        toast({ title: "Grade Added", description: "Your grade has been successfully recorded." });
-        setIsAddOpen(false);
-        form.reset();
-        
-        // Invalidate queries
-        queryClient.invalidateQueries({ queryKey: getGetAveragesQueryKey(studentId) });
-        queryClient.invalidateQueries({ queryKey: getGetDashboardQueryKey(studentId) });
-        queryClient.invalidateQueries({ queryKey: getGetComparisonQueryKey(studentId) });
-        if (selectedCourseId) {
-          queryClient.invalidateQueries({ queryKey: getGetGradeBreakdownQueryKey(studentId, selectedCourseId) });
-        }
-      },
-      onError: () => {
-        toast({ title: "Error", description: "Failed to add grade. Please try again.", variant: "destructive" });
-      }
-    }
-  });
-
-  const form = useForm<GradeFormValues>({
-    resolver: zodResolver(gradeSchema),
-    defaultValues: {
-      courseId: 0,
-      grade: 0,
-      weight: 10,
-      gradeType: "Assignment",
-      gradeDate: format(new Date(), "yyyy-MM-dd")
-    }
-  });
-
-  const onSubmit = (values: GradeFormValues) => {
-    addGradeMutation.mutate({
-      data: {
-        studentId,
-        ...values
-      }
-    });
-  };
 
   if (isLoadingAverages) {
     return (
@@ -148,90 +78,6 @@ export default function Averages() {
         title="Average Grade"
         description="Track your course averages, GPA, and grade trends over time."
         icon={GraduationCap}
-        actions={
-          <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-            <DialogTrigger asChild>
-              <Button className="shrink-0 gap-2 shadow-sm">
-                <Plus size={16} /> Add Grade
-              </Button>
-            </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Record New Grade</DialogTitle>
-              <DialogDescription>Add a new grade to update your averages.</DialogDescription>
-            </DialogHeader>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
-              <div className="space-y-2">
-                <Label htmlFor="courseId">Course</Label>
-                <Controller
-                  name="courseId"
-                  control={form.control}
-                  render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value ? field.value.toString() : ""}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select course" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {coursesData?.map(c => (
-                          <SelectItem key={c.id} value={c.id.toString()}>{c.courseName}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                {form.formState.errors.courseId && <p className="text-sm text-destructive">{form.formState.errors.courseId.message}</p>}
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="grade">Grade (%)</Label>
-                  <Input id="grade" type="number" step="0.1" {...form.register("grade")} />
-                  {form.formState.errors.grade && <p className="text-sm text-destructive">{form.formState.errors.grade.message}</p>}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="weight">Weight (%)</Label>
-                  <Input id="weight" type="number" step="0.1" {...form.register("weight")} />
-                  {form.formState.errors.weight && <p className="text-sm text-destructive">{form.formState.errors.weight.message}</p>}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="gradeType">Type</Label>
-                  <Controller
-                    name="gradeType"
-                    control={form.control}
-                    render={({ field }) => (
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Assignment">Assignment</SelectItem>
-                          <SelectItem value="Quiz">Quiz</SelectItem>
-                          <SelectItem value="Midterm">Midterm</SelectItem>
-                          <SelectItem value="Final">Final</SelectItem>
-                          <SelectItem value="Project">Project</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="gradeDate">Date</Label>
-                  <Input id="gradeDate" type="date" {...form.register("gradeDate")} />
-                </div>
-              </div>
-
-              <div className="pt-4 flex justify-end">
-                <Button type="submit" disabled={addGradeMutation.isPending}>
-                  {addGradeMutation.isPending ? "Saving..." : "Save Grade"}
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
-        }
       />
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -339,6 +185,12 @@ export default function Averages() {
                   <h3 className="text-3xl font-bold">{course.average ? course.average.toFixed(1) : '—'}<span className="text-lg text-muted-foreground font-normal ml-0.5">%</span></h3>
                   <span className="text-xs text-muted-foreground font-medium px-2 py-1 bg-muted rounded-md">{course.gradeCount} grades</span>
                 </div>
+                {course.finalGrade !== null && course.finalGrade !== undefined && (
+                  <p className="text-xs text-muted-foreground mt-3">
+                    Final: <span className="font-semibold text-foreground">{course.finalGrade.toFixed(1)}%</span>
+                    {course.letterGrade ? <span className="ml-1.5 px-1.5 py-0.5 bg-primary/10 text-primary rounded font-semibold">{course.letterGrade}</span> : null}
+                  </p>
+                )}
               </CardContent>
             </Card>
           ))}

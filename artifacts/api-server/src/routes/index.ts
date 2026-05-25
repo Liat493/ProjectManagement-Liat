@@ -7,6 +7,7 @@ import comparisonRouter from "./comparison";
 import gradesRouter from "./grades";
 import assignmentsRouter from "./assignments";
 import submissionsRouter from "./submissions";
+import attendanceRouter from "./attendance";
 import { requireAuth } from "../lib/auth";
 
 const router: IRouter = Router();
@@ -42,6 +43,7 @@ for (const sub of [
   gradesRouter,
   assignmentsRouter,
   submissionsRouter,
+  attendanceRouter,
 ]) {
   sub.param("studentId", ownStudentParam);
 }
@@ -52,5 +54,6 @@ router.use(comparisonRouter);
 router.use(gradesRouter);
 router.use(assignmentsRouter);
 router.use(submissionsRouter);
+router.use(attendanceRouter);
 
 export default router;
