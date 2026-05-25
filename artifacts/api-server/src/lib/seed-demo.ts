@@ -6,7 +6,7 @@ import { logger } from "./logger";
 const DEMO_EMAIL = "demo@student.com";
 const DEMO_PASSWORD = "123456";
 const DEMO_NAME = "Alex Cohen";
-const DEMO_SEMESTER = "Spring 2026";
+const DEMO_SEMESTER = "Winter Semester 2026";
 
 /**
  * Ensure a demo user exists and is linked to the existing seeded student (id 1) when present.

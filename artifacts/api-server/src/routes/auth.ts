@@ -25,7 +25,7 @@ const SignupBody = z
     email: z.string().trim().toLowerCase().email("Valid email is required"),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string().min(1, "Please confirm your password"),
-    semester: z.string().trim().optional().default("Spring 2026"),
+    semester: z.string().trim().optional().default("Winter Semester 2026"),
   })
   .refine((d: { password: string; confirmPassword: string }) => d.password === d.confirmPassword, {
     path: ["confirmPassword"],
@@ -61,9 +61,10 @@ async function seedSampleAcademicData(studentId: number) {
   // realistic for each term. Any unknown semester falls back to dates
   // relative to today (the original behaviour).
   const semesterDates: Record<string, [string, string, string]> = {
-    "Semester A 2024": ["2024-03-05", "2024-04-10", "2024-05-12"],
-    "Semester B 2024": ["2024-10-04", "2024-11-08", "2024-12-10"],
-    "Semester A 2025": ["2025-03-06", "2025-04-10", "2025-05-14"],
+    "Winter Semester 2024": ["2024-03-05", "2024-04-10", "2024-05-12"],
+    "Summer Semester 2024": ["2024-08-04", "2024-09-08", "2024-10-10"],
+    "Winter Semester 2025": ["2025-03-06", "2025-04-10", "2025-05-14"],
+    "Summer Semester 2025": ["2025-08-05", "2025-09-09", "2025-10-12"],
   };
 
   const gradeRows = courses.flatMap((c, i) => {
@@ -119,7 +120,7 @@ async function seedSampleAcademicData(studentId: number) {
   // Final-grade snapshots for any course in a past semester. Current-term
   // courses get no snapshot — their "final" is still in progress and is
   // computed dynamically by the averages endpoint.
-  const currentSemesters = new Set(["Spring 2026"]);
+  const currentSemesters = new Set(["Winter Semester 2026"]);
   const finalRows = courses
     .filter((c) => !currentSemesters.has(c.semester))
     .map((c, i) => {

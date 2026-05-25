@@ -15,7 +15,12 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { GraduationCap, AlertCircle, Loader2 } from "lucide-react";
 
-const SEMESTERS = ["Fall 2025", "Spring 2026", "Summer 2026", "Fall 2026"];
+const SEMESTERS = [
+  "Summer Semester 2025",
+  "Winter Semester 2026",
+  "Summer Semester 2026",
+  "Winter Semester 2027",
+];
 
 export default function SignupPage() {
   const [, navigate] = useLocation();
@@ -24,7 +29,7 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [semester, setSemester] = useState("Spring 2026");
+  const [semester, setSemester] = useState("Winter Semester 2026");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
