@@ -9,6 +9,7 @@ import {
   ShieldAlert,
   Grid3x3,
   Activity,
+  Lightbulb,
   GraduationCap as StudentIcon,
   LogOut,
 } from "lucide-react";
@@ -27,6 +28,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     { href: "/submissions", label: "Submission Rates", icon: Target },
     { href: "/heatmap", label: "Heatmap Analytics", icon: Grid3x3 },
     { href: "/habits", label: "Habit Tracking", icon: Activity },
+    { href: "/recommendations", label: "Smart Recommendations", icon: Lightbulb },
     { href: "/alerts", label: "Risk Alerts", icon: ShieldAlert },
   ];
 

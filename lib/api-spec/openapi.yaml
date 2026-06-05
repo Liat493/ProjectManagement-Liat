@@ -18,6 +18,7 @@ tags:
   - name: alerts
   - name: heatmap
   - name: habits
+  - name: recommendations
 paths:
   /healthz:
     get:
@@ -343,6 +344,47 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/HabitAlert" }
+  /recommendations/{studentId}:
+    get:
+      operationId: getRecommendations
+      tags: [recommendations]
+      summary: Smart Recommendations — student-specific, data-derived recommendations (from grades, weak topics/areas, submissions, learning activity, heatmap weak areas and risk alerts), per-course improvement tracking and the course list for filtering
+      parameters:
+        - in: path
+          name: studentId
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Smart Recommendations report
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RecommendationsReport" }
+  /recommendations/{studentId}/items/{recommendationId}:
+    patch:
+      operationId: updateRecommendationStatus
+      tags: [recommendations]
+      summary: Update the status of a recommendation (mark completed or dismiss)
+      parameters:
+        - in: path
+          name: studentId
+          required: true
+          schema: { type: integer }
+        - in: path
+          name: recommendationId
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RecommendationStatusInput" }
+      responses:
+        "200":
+          description: Updated recommendation
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Recommendation" }
   /submissions/{studentId}/goal:
     put:
       operationId: updateSubmissionGoal
@@ -943,4 +985,94 @@ components:
         alerts:
           type: array
           items: { $ref: "#/components/schemas/HabitAlert" }
+        generatedAt: { type: string }
+    Recommendation:
+      type: object
+      required:
+        - id
+        - studentId
+        - recommendationType
+        - title
+        - message
+        - reason
+        - priority
+        - status
+        - userStory
+        - createdAt
+        - updatedAt
+      properties:
+        id: { type: integer }
+        studentId: { type: integer }
+        courseId: { type: integer, nullable: true }
+        courseName: { type: string, nullable: true }
+        topic: { type: string, nullable: true }
+        recommendationType:
+          type: string
+          enum:
+            - low_grade
+            - weak_topic
+            - weak_course
+            - low_attendance
+            - low_submission
+            - risk_followup
+            - habit_followup
+        title: { type: string }
+        message: { type: string }
+        reason: { type: string }
+        priority: { type: string, enum: [low, medium, high] }
+        status: { type: string, enum: [active, completed, dismissed] }
+        userStory: { type: string }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+    RecommendationStatusInput:
+      type: object
+      required: [status]
+      properties:
+        status: { type: string, enum: [active, completed, dismissed] }
+    CourseImprovement:
+      type: object
+      required:
+        - courseId
+        - courseName
+        - trend
+        - earlierAverage
+        - laterAverage
+        - delta
+        - sampleSize
+      properties:
+        courseId: { type: integer }
+        courseName: { type: string }
+        trend: { type: string, enum: [improving, stable, declining, insufficient_data] }
+        earlierAverage: { type: number, nullable: true }
+        laterAverage: { type: number, nullable: true }
+        delta: { type: number, nullable: true }
+        currentAverage: { type: number, nullable: true }
+        sampleSize: { type: integer }
+    RecommendationCourse:
+      type: object
+      required: [courseId, courseName]
+      properties:
+        courseId: { type: integer }
+        courseName: { type: string }
+    RecommendationsReport:
+      type: object
+      required:
+        - recommendations
+        - improvements
+        - courses
+        - hasData
+        - generatedAt
+      properties:
+        recommendations:
+          type: array
+          items: { $ref: "#/components/schemas/Recommendation" }
+        improvements:
+          type: array
+          items: { $ref: "#/components/schemas/CourseImprovement" }
+        courses:
+          type: array
+          items: { $ref: "#/components/schemas/RecommendationCourse" }
+        hasData:
+          type: boolean
+          description: "False when the student has no academic data yet to base recommendations on (US17 safe message)."
         generatedAt: { type: string }

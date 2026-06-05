@@ -4,6 +4,7 @@ import {
   text,
   integer,
   real,
+  boolean,
   timestamp,
   date,
   index,
@@ -267,6 +268,69 @@ export const studyHabitAlertsTable = pgTable(
     uniq: uniqueIndex("study_habit_alerts_uniq").on(
       t.studentId,
       t.alertType,
+      t.relatedKey,
+    ),
+  }),
+);
+
+// Sprint 6 — Smart Recommendations (US15–US21, US36, US50).
+// Persistent store of student-specific, data-derived recommendations. Like the
+// Risk Alerts and Habit Alerts engines, recommendations are generated from the
+// student's EXISTING data (grades, attendance, submissions, study activity,
+// heatmap weak-area logic, risk alerts) and upserted here. The unique index on
+// (student_id, recommendation_type, related_key) makes generation idempotent so
+// re-running never creates duplicates (US19) and never resurrects a row the
+// student completed or dismissed. Recommendations are course-scoped via
+// courseId/courseName so they never mix across subjects (US21); a null courseId
+// is a "General" recommendation.
+//   recommendationType: 'low_grade' (US15) | 'weak_topic' (US16)
+//              | 'weak_course' (US36) | 'low_attendance' (US36)
+//              | 'low_submission' (US17) | 'risk_followup' (US50)
+//              | 'habit_followup' (US17)
+//   priority: 'low' | 'medium' | 'high'
+//   status:   'active' | 'completed' | 'dismissed'
+//   topic:    optional finer-grained area (e.g. grade type) when available.
+//   reason:   short, human-readable "why this was generated" (US18).
+//   sourceData: JSON snapshot of the metrics behind the recommendation.
+//   relatedKey: stable identifier of the underlying condition used to de-dupe.
+export const recommendationsTable = pgTable(
+  "recommendations",
+  {
+    id: serial("id").primaryKey(),
+    studentId: integer("student_id").notNull(),
+    courseId: integer("course_id"),
+    courseName: text("course_name"),
+    topic: text("topic"),
+    recommendationType: text("recommendation_type").notNull(),
+    title: text("title").notNull(),
+    message: text("message").notNull(),
+    reason: text("reason").notNull(),
+    priority: text("priority").notNull(),
+    status: text("status").notNull().default("active"),
+    // True only when the engine auto-completed this row because its underlying
+    // condition recovered. Lets generation reactivate it if the condition
+    // returns, while NEVER reactivating a row the student manually completed or
+    // dismissed (those keep autoCompleted = false).
+    autoCompleted: boolean("auto_completed").notNull().default(false),
+    sourceData: text("source_data"),
+    userStory: text("user_story").notNull(),
+    relatedKey: text("related_key").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => ({
+    studentIdx: index("recommendations_student_idx").on(t.studentId),
+    studentStatusIdx: index("recommendations_student_status_idx").on(
+      t.studentId,
+      t.status,
+    ),
+    uniq: uniqueIndex("recommendations_uniq").on(
+      t.studentId,
+      t.recommendationType,
       t.relatedKey,
     ),
   }),

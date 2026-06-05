@@ -1,0 +1,187 @@
+This prompt is only for extending the existing Student Academic Analytics system.
+
+Add a new feature called Smart Recommendations.
+
+Critical rules:
+- Do not rebuild the application.
+- Do not rewrite, remove, rename, duplicate, or break any existing feature, component, route, API, database table, database field, or UI behavior.
+- Preserve all existing features:
+  Dashboard, Average Grade, Comparison to Class Average, Submission Rate, Weekly Submission Schedule, Risk Alerts, Heatmap Analytics, and Learning Habit Tracking.
+- Before creating anything new, inspect the existing code and reuse existing data, components, services, UI patterns, styling, authentication, and database patterns wherever possible.
+- Add only what is required to fully implement Smart Recommendations.
+- Do not add unrelated features, duplicate pages, duplicate widgets, or duplicate analytics logic.
+- Do not duplicate or replace Heatmap Analytics, Risk Alerts, Learning Habit Tracking, Submission Rate, or Grade Average logic.
+- Smart Recommendations may read or reuse data from existing features, but must not rewrite them.
+- Do not perform general refactoring.
+- Do not make destructive database changes.
+- If recommendation data support is missing, add only the minimal safe model/table/mock data/local storage structure required for this feature.
+- All recommendations must be student-specific and based on the logged-in student’s data.
+- Keep the UI consistent with the existing dashboard design.
+
+Feature: Smart Recommendations
+
+Create a recommendation data structure with the following fields where relevant:
+- id
+- studentId
+- courseId
+- courseName
+- topic
+- recommendationType
+- title
+- message
+- reason
+- priority: low, medium, high
+- status: active, completed, dismissed
+- sourceData
+- createdAt
+- updatedAt
+
+Implement the following User Stories and requirements:
+
+US15 – Receive Recommendations After Receiving a Grade
+As a student, I want to receive recommendations after receiving a grade, so that I can improve based on my performance.
+
+Requirements:
+- Generate a recommendation after a new or updated grade when the grade indicates a performance issue.
+- Connect the recommendation to the relevant course.
+- If performance improves, update, remove, or mark old irrelevant recommendations as completed.
+- Do not change the existing grade flow. Only attach recommendation logic safely after grade data is available.
+
+US16 – Identify Weak Topics
+As a student, I want the system to identify weak topics, so that I can understand where I need to improve.
+
+Requirements:
+- Analyze existing grades, topics, course performance, heatmap weak areas, or available performance data.
+- Identify weak topics or weak course areas based on low scores, repeated low performance, or declining performance.
+- Generate a recommendation for each weak topic or weak area.
+- Include course name, topic name if available, recommendation text, and a clear reason.
+- Do not replace existing analytics. Add this as recommendation logic only.
+
+US17 – Personalized Recommendations
+As a student, I want personalized recommendations, so that the advice matches my academic situation.
+
+Requirements:
+- Generate recommendations using available student data:
+  grades, weak topics, course performance, submissions, learning activity, risk alerts, heatmap insights, and previous recommendations.
+- Avoid generic recommendations when specific student data exists.
+- If there is not enough data, show a safe message explaining that more data is needed.
+
+US18 – Understand Why a Recommendation Was Generated
+As a student, I want to understand why a recommendation was generated, so that I can trust and act on it.
+
+Requirements:
+- Every recommendation must show a clear reason.
+- Each recommendation card should include:
+  title, course name or General, message, reason, priority, status, and date created.
+- The explanation must be short, clear, and visible on the card or in simple details.
+
+US19 – Update Recommendations After New Data
+As a student, I want recommendations to update after new data, so that they remain relevant.
+
+Requirements:
+- Recalculate or update recommendations when grades, submissions, learning activity, heatmap insights, or risk alerts change.
+- Remove or mark completed recommendations that are no longer relevant.
+- Avoid duplicate recommendations for the same student, course, topic, and reason.
+- Do not rebuild the full application state. Only update recommendation data.
+
+US20 – Track Improvement Over Time
+As a student, I want to track improvement over time, so that I can see whether the recommendations helped.
+
+Requirements:
+- Add a simple improvement tracking section inside Smart Recommendations.
+- Compare older and newer data where available.
+- Track improvement using grades, weak topic performance, submission rate, learning activity, or reduced risk alerts.
+- Show whether each relevant course is improving, stable, or declining.
+- Do not change existing charts unless needed only to safely connect this feature.
+
+US21 – Recommendations Per Course
+As a student, I want recommendations per course, so that recommendations do not mix between different subjects.
+
+Requirements:
+- Link each recommendation to a course when possible.
+- Add a course filter with All Courses and individual courses.
+- When a course is selected, show only recommendations for that course.
+- Mark general recommendations as General.
+- Prevent recommendations from mixing between courses.
+
+US36 – Recommendations After Identifying Weak Areas
+As a student, I want to receive recommendations after weak areas are identified, so that I can improve specific weaknesses.
+
+Requirements:
+- Use weak areas identified by Heatmap Analytics or existing performance analysis.
+- Generate relevant recommendations from weak areas in grades, attendance, activity, or performance.
+- Link each recommendation to the weak area and course.
+- Do not modify Heatmap Analytics behavior. Only read or reuse its output/data.
+
+US50 – Recommendations Along With Risk Alerts
+As a student, I want to receive recommendations along with risk notifications, so that I know what action to take.
+
+Requirements:
+- Connect Smart Recommendations to existing Risk Alerts.
+- When a risk alert exists or is created, attach or display a relevant actionable recommendation.
+- Risk Alerts must continue working even if no recommendation exists.
+- Do not rewrite, replace, or break the Risk Alerts module.
+
+UI Requirements:
+- Add a Smart Recommendations section or page to the student analytics dashboard.
+- Include:
+  - recommendation cards
+  - course filter
+  - priority label
+  - recommendation type
+  - reason/explanation
+  - status action: dismiss or mark as completed
+  - improvement tracking section
+  - empty state
+  - loading state
+  - error state
+- Keep the UI consistent with the existing dashboard.
+- Do not redesign the dashboard.
+- Add only minimal navigation if needed.
+- Ensure responsive behavior.
+
+Service/API Requirements:
+- Add recommendation service functions or API endpoints only according to the existing project architecture.
+- Support:
+  - getting recommendations
+  - generating recommendations
+  - detecting weak topics
+  - updating recommendations after new data
+  - tracking improvement
+  - connecting recommendations to Risk Alerts
+  - using Heatmap weak-area data
+- If the project is frontend-only, implement this through services/mock data.
+- If backend routes exist, add safe endpoints without changing existing route names.
+
+Demo Data Requirement:
+Make sure the demo student has realistic data that demonstrates:
+- recommendation after a low grade
+- weak topic recommendation
+- personalized recommendation
+- visible reason for every recommendation
+- recommendation update after new data
+- improvement tracking
+- recommendations per course
+- recommendation from Heatmap weak areas
+- recommendation connected to Risk Alerts
+
+Do not hardcode the UI result. Recommendations must be generated from data.
+
+Validation:
+After implementation, verify:
+- Smart Recommendations works correctly.
+- Recommendations are not duplicated.
+- Recommendations do not mix between courses.
+- Recommendations have clear reasons.
+- Dismiss and completed statuses work.
+- Existing features still work:
+  Dashboard, Average Grade, Comparison to Class Average, Submission Rate, Weekly Submission Schedule, Risk Alerts, Heatmap Analytics, and Learning Habit Tracking.
+
+After implementation, provide a short report:
+1. Files changed
+2. Files added
+3. Database/mock/localStorage changes
+4. How US15–US21, US36, and US50 were implemented
+5. How existing data from grades, submissions, learning habits, heatmap, and risk alerts is used
+6. How to test Smart Recommendations
+7. Confirmation that no existing feature was broken

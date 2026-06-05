@@ -515,6 +515,102 @@ export interface HabitsReport {
   generatedAt: string;
 }
 
+export type RecommendationRecommendationType = typeof RecommendationRecommendationType[keyof typeof RecommendationRecommendationType];
+
+
+export const RecommendationRecommendationType = {
+  low_grade: 'low_grade',
+  weak_topic: 'weak_topic',
+  weak_course: 'weak_course',
+  low_attendance: 'low_attendance',
+  low_submission: 'low_submission',
+  risk_followup: 'risk_followup',
+  habit_followup: 'habit_followup',
+} as const;
+
+export type RecommendationPriority = typeof RecommendationPriority[keyof typeof RecommendationPriority];
+
+
+export const RecommendationPriority = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+} as const;
+
+export type RecommendationStatus = typeof RecommendationStatus[keyof typeof RecommendationStatus];
+
+
+export const RecommendationStatus = {
+  active: 'active',
+  completed: 'completed',
+  dismissed: 'dismissed',
+} as const;
+
+export interface Recommendation {
+  id: number;
+  studentId: number;
+  courseId?: number | null;
+  courseName?: string | null;
+  topic?: string | null;
+  recommendationType: RecommendationRecommendationType;
+  title: string;
+  message: string;
+  reason: string;
+  priority: RecommendationPriority;
+  status: RecommendationStatus;
+  userStory: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type RecommendationStatusInputStatus = typeof RecommendationStatusInputStatus[keyof typeof RecommendationStatusInputStatus];
+
+
+export const RecommendationStatusInputStatus = {
+  active: 'active',
+  completed: 'completed',
+  dismissed: 'dismissed',
+} as const;
+
+export interface RecommendationStatusInput {
+  status: RecommendationStatusInputStatus;
+}
+
+export type CourseImprovementTrend = typeof CourseImprovementTrend[keyof typeof CourseImprovementTrend];
+
+
+export const CourseImprovementTrend = {
+  improving: 'improving',
+  stable: 'stable',
+  declining: 'declining',
+  insufficient_data: 'insufficient_data',
+} as const;
+
+export interface CourseImprovement {
+  courseId: number;
+  courseName: string;
+  trend: CourseImprovementTrend;
+  earlierAverage: number | null;
+  laterAverage: number | null;
+  delta: number | null;
+  currentAverage?: number | null;
+  sampleSize: number;
+}
+
+export interface RecommendationCourse {
+  courseId: number;
+  courseName: string;
+}
+
+export interface RecommendationsReport {
+  recommendations: Recommendation[];
+  improvements: CourseImprovement[];
+  courses: RecommendationCourse[];
+  /** False when the student has no academic data yet to base recommendations on (US17 safe message). */
+  hasData: boolean;
+  generatedAt: string;
+}
+
 export type GetAveragesParams = {
 /**
  * Filter averages to a single semester. Defaults to all semesters.

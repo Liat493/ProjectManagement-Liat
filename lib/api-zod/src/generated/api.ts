@@ -477,6 +477,79 @@ export const UpdateHabitAlertStatusResponse = zod.object({
 })
 
 
+/**
+ * @summary Smart Recommendations — student-specific, data-derived recommendations (from grades, weak topics/areas, submissions, learning activity, heatmap weak areas and risk alerts), per-course improvement tracking and the course list for filtering
+ */
+export const GetRecommendationsParams = zod.object({
+  "studentId": zod.coerce.number()
+})
+
+export const GetRecommendationsResponse = zod.object({
+  "recommendations": zod.array(zod.object({
+  "id": zod.number(),
+  "studentId": zod.number(),
+  "courseId": zod.number().nullish(),
+  "courseName": zod.string().nullish(),
+  "topic": zod.string().nullish(),
+  "recommendationType": zod.enum(['low_grade', 'weak_topic', 'weak_course', 'low_attendance', 'low_submission', 'risk_followup', 'habit_followup']),
+  "title": zod.string(),
+  "message": zod.string(),
+  "reason": zod.string(),
+  "priority": zod.enum(['low', 'medium', 'high']),
+  "status": zod.enum(['active', 'completed', 'dismissed']),
+  "userStory": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "improvements": zod.array(zod.object({
+  "courseId": zod.number(),
+  "courseName": zod.string(),
+  "trend": zod.enum(['improving', 'stable', 'declining', 'insufficient_data']),
+  "earlierAverage": zod.number().nullable(),
+  "laterAverage": zod.number().nullable(),
+  "delta": zod.number().nullable(),
+  "currentAverage": zod.number().nullish(),
+  "sampleSize": zod.number()
+})),
+  "courses": zod.array(zod.object({
+  "courseId": zod.number(),
+  "courseName": zod.string()
+})),
+  "hasData": zod.boolean().describe('False when the student has no academic data yet to base recommendations on (US17 safe message).'),
+  "generatedAt": zod.string()
+})
+
+
+/**
+ * @summary Update the status of a recommendation (mark completed or dismiss)
+ */
+export const UpdateRecommendationStatusParams = zod.object({
+  "studentId": zod.coerce.number(),
+  "recommendationId": zod.coerce.number()
+})
+
+export const UpdateRecommendationStatusBody = zod.object({
+  "status": zod.enum(['active', 'completed', 'dismissed'])
+})
+
+export const UpdateRecommendationStatusResponse = zod.object({
+  "id": zod.number(),
+  "studentId": zod.number(),
+  "courseId": zod.number().nullish(),
+  "courseName": zod.string().nullish(),
+  "topic": zod.string().nullish(),
+  "recommendationType": zod.enum(['low_grade', 'weak_topic', 'weak_course', 'low_attendance', 'low_submission', 'risk_followup', 'habit_followup']),
+  "title": zod.string(),
+  "message": zod.string(),
+  "reason": zod.string(),
+  "priority": zod.enum(['low', 'medium', 'high']),
+  "status": zod.enum(['active', 'completed', 'dismissed']),
+  "userStory": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
 export const UpdateSubmissionGoalParams = zod.object({
   "studentId": zod.coerce.number()
 })

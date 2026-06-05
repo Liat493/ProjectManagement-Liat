@@ -1,1 +1,2 @@
 - [Orval hook data typing](orval-hook-data-typing.md) — typing props as `ReturnType<typeof useGetX>["data"]` collapses to `{}`; import the generated response type instead. Rebuild api-client-react dist after codegen.
+- [Reconciliation upsert setWhere](recommendation-reconciliation-upsert.md) — regenerate-on-read engines: `setWhere` must be `status='active' OR <sentinel>`, not the sentinel alone, or still-active rows go stale.

@@ -240,6 +240,12 @@ export default function Dashboard() {
             description="Track study focus, consistency and productive hours."
             icon={Activity}
           />
+          <ModuleCard
+            href="/recommendations"
+            title="Smart Recommendations"
+            description="Personalised, data-driven tips to help you improve."
+            icon={Lightbulb}
+          />
         </div>
       </section>
     </div>

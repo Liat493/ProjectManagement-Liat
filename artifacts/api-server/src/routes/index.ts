@@ -11,6 +11,7 @@ import attendanceRouter from "./attendance";
 import alertsRouter from "./alerts";
 import heatmapRouter from "./heatmap";
 import habitsRouter from "./habits";
+import recommendationsRouter from "./recommendations";
 import { requireAuth } from "../lib/auth";
 
 const router: IRouter = Router();
@@ -50,6 +51,7 @@ for (const sub of [
   alertsRouter,
   heatmapRouter,
   habitsRouter,
+  recommendationsRouter,
 ]) {
   sub.param("studentId", ownStudentParam);
 }
@@ -64,5 +66,6 @@ router.use(attendanceRouter);
 router.use(alertsRouter);
 router.use(heatmapRouter);
 router.use(habitsRouter);
+router.use(recommendationsRouter);
 
 export default router;

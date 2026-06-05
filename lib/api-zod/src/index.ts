@@ -47,3 +47,8 @@ export type { HabitTrends } from "./generated/types/habitTrends";
 export type { HabitAlert } from "./generated/types/habitAlert";
 export type { HabitAlertStatusInput } from "./generated/types/habitAlertStatusInput";
 export type { HabitsReport } from "./generated/types/habitsReport";
+export type { Recommendation } from "./generated/types/recommendation";
+export type { RecommendationStatusInput } from "./generated/types/recommendationStatusInput";
+export type { CourseImprovement } from "./generated/types/courseImprovement";
+export type { RecommendationCourse } from "./generated/types/recommendationCourse";
+export type { RecommendationsReport } from "./generated/types/recommendationsReport";

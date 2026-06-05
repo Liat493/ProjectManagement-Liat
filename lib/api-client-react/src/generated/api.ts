@@ -38,6 +38,9 @@ import type {
   HealthStatus,
   HeatmapReport,
   MissedAssignment,
+  Recommendation,
+  RecommendationStatusInput,
+  RecommendationsReport,
   RiskAlert,
   SubmissionGoal,
   SubmissionGoalInput,
@@ -1257,6 +1260,157 @@ export const useUpdateHabitAlertStatus = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getUpdateHabitAlertStatusMutationOptions(options));
+    }
+
+export const getGetRecommendationsUrl = (studentId: number,) => {
+
+
+
+
+  return `/api/recommendations/${studentId}`
+}
+
+/**
+ * @summary Smart Recommendations — student-specific, data-derived recommendations (from grades, weak topics/areas, submissions, learning activity, heatmap weak areas and risk alerts), per-course improvement tracking and the course list for filtering
+ */
+export const getRecommendations = async (studentId: number, options?: RequestInit): Promise<RecommendationsReport> => {
+
+  return customFetch<RecommendationsReport>(getGetRecommendationsUrl(studentId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetRecommendationsQueryKey = (studentId: number,) => {
+    return [
+    `/api/recommendations/${studentId}`
+    ] as const;
+    }
+
+
+export const getGetRecommendationsQueryOptions = <TData = Awaited<ReturnType<typeof getRecommendations>>, TError = ErrorType<unknown>>(studentId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRecommendations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetRecommendationsQueryKey(studentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRecommendations>>> = ({ signal }) => getRecommendations(studentId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(studentId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRecommendations>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetRecommendationsQueryResult = NonNullable<Awaited<ReturnType<typeof getRecommendations>>>
+export type GetRecommendationsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Smart Recommendations — student-specific, data-derived recommendations (from grades, weak topics/areas, submissions, learning activity, heatmap weak areas and risk alerts), per-course improvement tracking and the course list for filtering
+ */
+
+export function useGetRecommendations<TData = Awaited<ReturnType<typeof getRecommendations>>, TError = ErrorType<unknown>>(
+ studentId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRecommendations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetRecommendationsQueryOptions(studentId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateRecommendationStatusUrl = (studentId: number,
+    recommendationId: number,) => {
+
+
+
+
+  return `/api/recommendations/${studentId}/items/${recommendationId}`
+}
+
+/**
+ * @summary Update the status of a recommendation (mark completed or dismiss)
+ */
+export const updateRecommendationStatus = async (studentId: number,
+    recommendationId: number,
+    recommendationStatusInput: RecommendationStatusInput, options?: RequestInit): Promise<Recommendation> => {
+
+  return customFetch<Recommendation>(getUpdateRecommendationStatusUrl(studentId,recommendationId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      recommendationStatusInput,)
+  }
+);}
+
+
+
+
+export const getUpdateRecommendationStatusMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateRecommendationStatus>>, TError,{studentId: number;recommendationId: number;data: BodyType<RecommendationStatusInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateRecommendationStatus>>, TError,{studentId: number;recommendationId: number;data: BodyType<RecommendationStatusInput>}, TContext> => {
+
+const mutationKey = ['updateRecommendationStatus'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateRecommendationStatus>>, {studentId: number;recommendationId: number;data: BodyType<RecommendationStatusInput>}> = (props) => {
+          const {studentId,recommendationId,data} = props ?? {};
+
+          return  updateRecommendationStatus(studentId,recommendationId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateRecommendationStatusMutationResult = NonNullable<Awaited<ReturnType<typeof updateRecommendationStatus>>>
+    export type UpdateRecommendationStatusMutationBody = BodyType<RecommendationStatusInput>
+    export type UpdateRecommendationStatusMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update the status of a recommendation (mark completed or dismiss)
+ */
+export const useUpdateRecommendationStatus = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateRecommendationStatus>>, TError,{studentId: number;recommendationId: number;data: BodyType<RecommendationStatusInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateRecommendationStatus>>,
+        TError,
+        {studentId: number;recommendationId: number;data: BodyType<RecommendationStatusInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateRecommendationStatusMutationOptions(options));
     }
 
 export const getUpdateSubmissionGoalUrl = (studentId: number,) => {
