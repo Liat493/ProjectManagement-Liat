@@ -1,6 +1,6 @@
 import app from "./app";
 import { logger } from "./lib/logger";
-import { ensureDemoUser } from "./lib/seed-demo";
+import { ensureDemoUser, ensureDemoStudySessions } from "./lib/seed-demo";
 
 const rawPort = process.env["PORT"];
 
@@ -23,5 +23,7 @@ app.listen(port, (err) => {
   }
 
   logger.info({ port }, "Server listening");
-  void ensureDemoUser();
+  void ensureDemoUser().then(async (studentId) => {
+    if (studentId != null) await ensureDemoStudySessions(studentId);
+  });
 });

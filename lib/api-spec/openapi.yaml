@@ -17,6 +17,7 @@ tags:
   - name: attendance
   - name: alerts
   - name: heatmap
+  - name: habits
 paths:
   /healthz:
     get:
@@ -301,6 +302,47 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/HeatmapReport" }
+  /habits/{studentId}:
+    get:
+      operationId: getHabits
+      tags: [habits]
+      summary: Learning habit tracking — daily study summary, weekly consistency, average session duration, productive hours, submission habits, trends and inconsistency alerts
+      parameters:
+        - in: path
+          name: studentId
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Learning habit tracking report
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/HabitsReport" }
+  /habits/{studentId}/alerts/{alertId}:
+    patch:
+      operationId: updateHabitAlertStatus
+      tags: [habits]
+      summary: Update the status of a learning-habit alert (e.g. dismiss)
+      parameters:
+        - in: path
+          name: studentId
+          required: true
+          schema: { type: integer }
+        - in: path
+          name: alertId
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/HabitAlertStatusInput" }
+      responses:
+        "200":
+          description: Updated alert
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/HabitAlert" }
   /submissions/{studentId}/goal:
     put:
       operationId: updateSubmissionGoal
@@ -752,4 +794,153 @@ components:
         recommendations:
           type: array
           items: { $ref: "#/components/schemas/HeatmapRecommendation" }
+        generatedAt: { type: string }
+    HabitDailySummary:
+      type: object
+      required: [totalMinutes, sessionCount, averageMinutes, lastActivityAt]
+      properties:
+        totalMinutes: { type: integer, description: "Total valid study minutes today." }
+        sessionCount: { type: integer }
+        averageMinutes: { type: ["number", "null"] }
+        lastActivityAt: { type: ["string", "null"], description: "ISO timestamp of the most recent study session." }
+    HabitDayPattern:
+      type: object
+      required: [date, label, active, minutes, sessions]
+      properties:
+        date: { type: string, description: "YYYY-MM-DD" }
+        label: { type: string, description: "Short weekday label, e.g. Mon" }
+        active: { type: boolean }
+        minutes: { type: integer }
+        sessions: { type: integer }
+    HabitWeeklyConsistency:
+      type: object
+      required:
+        - activeDays
+        - inactiveDays
+        - totalDaysStudied
+        - currentStreak
+        - pattern
+      properties:
+        activeDays: { type: integer, description: "Days with >=1 valid session in the last 7 days." }
+        inactiveDays: { type: integer }
+        totalDaysStudied: { type: integer, description: "All-time distinct days with study activity." }
+        currentStreak: { type: integer, description: "Consecutive active days ending today." }
+        pattern:
+          type: array
+          items: { $ref: "#/components/schemas/HabitDayPattern" }
+    HabitAverageDurations:
+      type: object
+      required: [daily, weekly, monthly]
+      properties:
+        daily: { type: ["number", "null"], description: "Avg session duration (min) today." }
+        weekly: { type: ["number", "null"], description: "Avg session duration (min) over the last 7 days." }
+        monthly: { type: ["number", "null"], description: "Avg session duration (min) over the last 30 days." }
+    HabitProductiveHour:
+      type: object
+      required: [hour, totalMinutes, sessionCount]
+      properties:
+        hour: { type: integer, description: "Hour of day 0-23." }
+        totalMinutes: { type: integer }
+        sessionCount: { type: integer }
+    HabitSubmissionStats:
+      type: object
+      required: [total, onTime, late, submissionRate]
+      properties:
+        total: { type: integer, description: "Assignments considered (due)." }
+        onTime: { type: integer }
+        late: { type: integer }
+        submissionRate: { type: number, description: "Percentage submitted (on-time + late) of total." }
+    HabitCourseSubmission:
+      type: object
+      required: [courseId, courseName, total, onTime, late, submissionRate]
+      properties:
+        courseId: { type: integer }
+        courseName: { type: string }
+        total: { type: integer }
+        onTime: { type: integer }
+        late: { type: integer }
+        submissionRate: { type: number }
+    HabitSubmissionHabits:
+      type: object
+      required: [overall, byCourse]
+      properties:
+        overall: { $ref: "#/components/schemas/HabitSubmissionStats" }
+        byCourse:
+          type: array
+          items: { $ref: "#/components/schemas/HabitCourseSubmission" }
+    HabitTrendPoint:
+      type: object
+      required: [label, minutes, sessions]
+      properties:
+        label: { type: string }
+        minutes: { type: integer }
+        sessions: { type: integer }
+    HabitTrends:
+      type: object
+      required: [daily, weekly, monthly]
+      properties:
+        daily:
+          type: array
+          items: { $ref: "#/components/schemas/HabitTrendPoint" }
+        weekly:
+          type: array
+          items: { $ref: "#/components/schemas/HabitTrendPoint" }
+        monthly:
+          type: array
+          items: { $ref: "#/components/schemas/HabitTrendPoint" }
+    HabitAlert:
+      type: object
+      required:
+        - id
+        - alertType
+        - title
+        - message
+        - severity
+        - status
+        - userStory
+        - createdAt
+      properties:
+        id: { type: integer }
+        alertType:
+          type: string
+          enum: [inactivity, duration_drop, consistency_decline]
+        title: { type: string }
+        message: { type: string }
+        severity: { type: string, enum: [low, medium, high] }
+        status: { type: string, enum: [active, dismissed] }
+        userStory: { type: string }
+        createdAt: { type: string }
+    HabitAlertStatusInput:
+      type: object
+      required: [status]
+      properties:
+        status: { type: string, enum: [active, dismissed] }
+    HabitsReport:
+      type: object
+      required:
+        - dailySummary
+        - weeklyConsistency
+        - averageDurations
+        - productiveHours
+        - peakHours
+        - submissionHabits
+        - trends
+        - alerts
+        - generatedAt
+      properties:
+        dailySummary: { $ref: "#/components/schemas/HabitDailySummary" }
+        weeklyConsistency: { $ref: "#/components/schemas/HabitWeeklyConsistency" }
+        averageDurations: { $ref: "#/components/schemas/HabitAverageDurations" }
+        productiveHours:
+          type: array
+          items: { $ref: "#/components/schemas/HabitProductiveHour" }
+        peakHours:
+          type: array
+          items: { type: integer }
+          description: "Hours (0-23) with the highest total study minutes."
+        submissionHabits: { $ref: "#/components/schemas/HabitSubmissionHabits" }
+        trends: { $ref: "#/components/schemas/HabitTrends" }
+        alerts:
+          type: array
+          items: { $ref: "#/components/schemas/HabitAlert" }
         generatedAt: { type: string }

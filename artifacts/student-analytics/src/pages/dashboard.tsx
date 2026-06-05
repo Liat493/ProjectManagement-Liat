@@ -27,6 +27,7 @@ import {
   ShieldCheck,
   Lightbulb,
   Grid3x3,
+  Activity,
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { PageHeader } from "@/components/page-header";
@@ -232,6 +233,12 @@ export default function Dashboard() {
             title="Heatmap Analytics"
             description="See attendance and grade patterns at a glance."
             icon={Grid3x3}
+          />
+          <ModuleCard
+            href="/habits"
+            title="Habit Tracking"
+            description="Track study focus, consistency and productive hours."
+            icon={Activity}
           />
         </div>
       </section>

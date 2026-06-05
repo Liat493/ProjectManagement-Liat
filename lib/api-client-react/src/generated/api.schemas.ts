@@ -359,6 +359,162 @@ export interface HeatmapReport {
   generatedAt: string;
 }
 
+export interface HabitDailySummary {
+  /** Total valid study minutes today. */
+  totalMinutes: number;
+  sessionCount: number;
+  /** @nullable */
+  averageMinutes: number | null;
+  /**
+     * ISO timestamp of the most recent study session.
+     * @nullable
+     */
+  lastActivityAt: string | null;
+}
+
+export interface HabitDayPattern {
+  /** YYYY-MM-DD */
+  date: string;
+  /** Short weekday label, e.g. Mon */
+  label: string;
+  active: boolean;
+  minutes: number;
+  sessions: number;
+}
+
+export interface HabitWeeklyConsistency {
+  /** Days with >=1 valid session in the last 7 days. */
+  activeDays: number;
+  inactiveDays: number;
+  /** All-time distinct days with study activity. */
+  totalDaysStudied: number;
+  /** Consecutive active days ending today. */
+  currentStreak: number;
+  pattern: HabitDayPattern[];
+}
+
+export interface HabitAverageDurations {
+  /**
+     * Avg session duration (min) today.
+     * @nullable
+     */
+  daily: number | null;
+  /**
+     * Avg session duration (min) over the last 7 days.
+     * @nullable
+     */
+  weekly: number | null;
+  /**
+     * Avg session duration (min) over the last 30 days.
+     * @nullable
+     */
+  monthly: number | null;
+}
+
+export interface HabitProductiveHour {
+  /** Hour of day 0-23. */
+  hour: number;
+  totalMinutes: number;
+  sessionCount: number;
+}
+
+export interface HabitSubmissionStats {
+  /** Assignments considered (due). */
+  total: number;
+  onTime: number;
+  late: number;
+  /** Percentage submitted (on-time + late) of total. */
+  submissionRate: number;
+}
+
+export interface HabitCourseSubmission {
+  courseId: number;
+  courseName: string;
+  total: number;
+  onTime: number;
+  late: number;
+  submissionRate: number;
+}
+
+export interface HabitSubmissionHabits {
+  overall: HabitSubmissionStats;
+  byCourse: HabitCourseSubmission[];
+}
+
+export interface HabitTrendPoint {
+  label: string;
+  minutes: number;
+  sessions: number;
+}
+
+export interface HabitTrends {
+  daily: HabitTrendPoint[];
+  weekly: HabitTrendPoint[];
+  monthly: HabitTrendPoint[];
+}
+
+export type HabitAlertAlertType = typeof HabitAlertAlertType[keyof typeof HabitAlertAlertType];
+
+
+export const HabitAlertAlertType = {
+  inactivity: 'inactivity',
+  duration_drop: 'duration_drop',
+  consistency_decline: 'consistency_decline',
+} as const;
+
+export type HabitAlertSeverity = typeof HabitAlertSeverity[keyof typeof HabitAlertSeverity];
+
+
+export const HabitAlertSeverity = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+} as const;
+
+export type HabitAlertStatus = typeof HabitAlertStatus[keyof typeof HabitAlertStatus];
+
+
+export const HabitAlertStatus = {
+  active: 'active',
+  dismissed: 'dismissed',
+} as const;
+
+export interface HabitAlert {
+  id: number;
+  alertType: HabitAlertAlertType;
+  title: string;
+  message: string;
+  severity: HabitAlertSeverity;
+  status: HabitAlertStatus;
+  userStory: string;
+  createdAt: string;
+}
+
+export type HabitAlertStatusInputStatus = typeof HabitAlertStatusInputStatus[keyof typeof HabitAlertStatusInputStatus];
+
+
+export const HabitAlertStatusInputStatus = {
+  active: 'active',
+  dismissed: 'dismissed',
+} as const;
+
+export interface HabitAlertStatusInput {
+  status: HabitAlertStatusInputStatus;
+}
+
+export interface HabitsReport {
+  dailySummary: HabitDailySummary;
+  weeklyConsistency: HabitWeeklyConsistency;
+  averageDurations: HabitAverageDurations;
+  productiveHours: HabitProductiveHour[];
+  /** Hours (0-23) with the highest total study minutes. */
+  peakHours: number[];
+  submissionHabits: HabitSubmissionHabits;
+  trends: HabitTrends;
+  alerts: HabitAlert[];
+  generatedAt: string;
+}
+
 export type GetAveragesParams = {
 /**
  * Filter averages to a single semester. Defaults to all semesters.

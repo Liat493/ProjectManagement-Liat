@@ -1,0 +1,136 @@
+This prompt is only for extending the existing Student Academic Analytics system.
+
+Add a new analytics feature called Learning Habit Tracking according to the requirements below.
+
+Critical rules:
+- Do not rebuild the application.
+- Do not rewrite, remove, rename, duplicate, or break any existing feature, component, route, API, database table, database field, or UI behavior.
+- Preserve all existing features:
+  Dashboard, Average Grade, Comparison to Class Average, Submission Rate, Weekly Submission Schedule, Risk Alerts, and Heatmap Analytics.
+- Before creating anything new, inspect the existing code/data and reuse existing students, courses, assignments, submissions, activity data, UI components, styling, services, authentication, and database patterns where possible.
+- Add only what is required to fully implement Learning Habit Tracking.
+- Do not add unnecessary pages, duplicate widgets, duplicate analytics logic, or unrelated features.
+- Do not perform general refactoring.
+- Do not make destructive database changes.
+- If learning activity data/database support is missing, add only minimal safe fields or realistic demo data required for this feature.
+- All analytics data must be user-specific and filtered by the logged-in student.
+- Keep the feature part of the student-side analytics dashboard.
+- Keep the UI consistent with the existing design.
+
+Feature: Learning Habit Tracking
+
+Implement the following User Stories:
+
+US1 – View Daily Study Activity Summary
+- Calculate total study duration for the current day.
+- Aggregate all study sessions belonging to the logged-in student.
+- Ignore invalid or incomplete sessions.
+- Return/display:
+  - total study time today
+  - number of study sessions
+  - average session duration
+  - last study activity timestamp
+- Create a Daily Study Summary widget.
+- Include loading, empty, and error states.
+
+US2 – Track Weekly Learning Consistency
+- Create weekly aggregation logic.
+- Calculate:
+  - active study days
+  - inactive days
+  - total days studied
+  - consecutive learning streak
+  - weekly activity pattern
+- Active day = at least one study session.
+- Inactive day = zero study sessions.
+- Create a Weekly Consistency Chart with clear indicators and tooltips.
+
+US3 – Monitor Average Session Duration
+- Calculate average study session duration for:
+  - daily
+  - weekly
+  - monthly
+- Add a period selector.
+- Update the displayed average dynamically when the period changes.
+- Keep the widget responsive and consistent with the dashboard style.
+
+US4 – View Most Productive Study Hours
+- Analyze study activity by hour.
+- Calculate:
+  - total study duration per hour
+  - session count per hour
+  - peak productivity hours
+- Create a Productivity Heatmap.
+- Show hourly activity intensity, most productive hours, and visual learning patterns.
+- Add hover tooltips and accessible color contrast.
+
+US5 – Track Assignment Submission Habits
+- Reuse existing assignment/submission data where possible.
+- Classify submissions as:
+  - On Time
+  - Late
+- Calculate:
+  - total submissions
+  - on-time submissions
+  - late submissions
+  - submission rate
+- Add course filtering:
+  - All Courses
+  - Individual Course
+- Create a Submission Habits widget with clear visual indicators.
+- Do not duplicate or replace the existing Submission Rate feature.
+
+US6 – View Learning Habit Trends Over Time
+- Create historical aggregation for learning activity.
+- Support:
+  - daily trends
+  - weekly trends
+  - monthly trends
+- Create trend analytics charts.
+- Add a time range selector.
+- Show dynamic chart updates and trend indicators.
+- Keep the chart responsive and visually consistent.
+
+US7 – Receive Alerts for Inconsistent Study Activity
+- Create inactivity and consistency decline detection logic.
+- Generate alerts when:
+  - there is no study activity for a configurable number of days
+  - study duration drops below a configurable threshold
+  - weekly consistency significantly declines
+- Display alerts with:
+  - alert title
+  - alert description
+  - alert date
+  - severity level
+- Add dismiss functionality.
+- Prevent dismissed alerts from reappearing unnecessarily.
+- Do not duplicate or rewrite the existing Risk Alerts module. These alerts should support Learning Habit Tracking only, and integrate safely with existing alert patterns if available.
+
+Technical requirements:
+- Use the existing architecture, folder structure, styling, and UI patterns.
+- Reuse existing database/data structures where possible.
+- Add loading states, empty states, and error states.
+- Handle missing, invalid, incomplete, or empty study activity data gracefully.
+- Ensure responsive behavior for desktop and mobile.
+- Avoid duplicate calculations and duplicate UI sections.
+- Add tests or manual validation steps if the project structure supports it.
+
+Demo data requirement:
+Make sure the demo student has realistic learning activity data that demonstrates:
+- daily study summary
+- weekly consistency
+- average session duration by period
+- productive study hours
+- submission habits
+- learning habit trends
+- at least one inconsistent study activity alert
+
+Do not hardcode the UI result. The displayed analytics must be generated from the data.
+
+After implementation, provide a short report:
+1. Files changed
+2. Files added
+3. Database/demo data changes
+4. How US1–US7 were implemented
+5. How to test Learning Habit Tracking
+6. Confirmation that Dashboard, Average Grade, Comparison to Class Average, Submission Rate, Weekly Submission Schedule, Risk Alerts, and Heatmap Analytics still work

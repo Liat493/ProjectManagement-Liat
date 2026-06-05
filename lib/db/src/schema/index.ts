@@ -201,3 +201,73 @@ export const riskAlertsTable = pgTable(
     ),
   }),
 );
+
+// Sprint 5 — Learning Habit Tracking.
+// Raw study-activity log for a student. Aggregating these powers the daily
+// summary, weekly consistency, average session duration, productive-hours
+// analysis and habit trends. A session is only counted as valid when it is
+// complete (`endedAt` set) and has a positive `durationMinutes`; invalid or
+// incomplete rows are ignored by all analytics.
+export const studySessionsTable = pgTable(
+  "study_sessions",
+  {
+    id: serial("id").primaryKey(),
+    studentId: integer("student_id").notNull(),
+    courseId: integer("course_id"),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+    endedAt: timestamp("ended_at", { withTimezone: true }),
+    durationMinutes: integer("duration_minutes"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => ({
+    studentIdx: index("study_sessions_student_idx").on(t.studentId),
+    studentStartedIdx: index("study_sessions_student_started_idx").on(
+      t.studentId,
+      t.startedAt,
+    ),
+  }),
+);
+
+// Sprint 5 — Learning Habit Tracking, US7.
+// Kept deliberately SEPARATE from `risk_alerts` so the existing Risk Alerts
+// module is untouched. Same generation/dedupe pattern: alerts are derived from
+// study activity and upserted; the unique index makes generation idempotent so
+// a dismissed alert is never resurrected for the same condition.
+//   alertType: 'inactivity' | 'duration_drop' | 'consistency_decline'
+//   severity:  'low' | 'medium' | 'high'
+//   status:    'active' | 'dismissed'
+//   relatedKey: stable identifier of the underlying episode used to de-dupe.
+export const studyHabitAlertsTable = pgTable(
+  "study_habit_alerts",
+  {
+    id: serial("id").primaryKey(),
+    studentId: integer("student_id").notNull(),
+    alertType: text("alert_type").notNull(),
+    title: text("title").notNull(),
+    message: text("message").notNull(),
+    severity: text("severity").notNull(),
+    status: text("status").notNull().default("active"),
+    userStory: text("user_story").notNull(),
+    relatedKey: text("related_key").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => ({
+    studentIdx: index("study_habit_alerts_student_idx").on(t.studentId),
+    studentStatusIdx: index("study_habit_alerts_student_status_idx").on(
+      t.studentId,
+      t.status,
+    ),
+    uniq: uniqueIndex("study_habit_alerts_uniq").on(
+      t.studentId,
+      t.alertType,
+      t.relatedKey,
+    ),
+  }),
+);

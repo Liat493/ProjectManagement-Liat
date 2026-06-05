@@ -16,6 +16,7 @@ import Schedule from "@/pages/schedule";
 import Submissions from "@/pages/submissions";
 import Alerts from "@/pages/alerts";
 import Heatmap from "@/pages/heatmap";
+import Habits from "@/pages/habits";
 import { GraduationCap } from "lucide-react";
 
 const queryClient = new QueryClient({
@@ -51,6 +52,7 @@ function ProtectedShell() {
         <Route path="/schedule" component={Schedule} />
         <Route path="/submissions" component={Submissions} />
         <Route path="/heatmap" component={Heatmap} />
+        <Route path="/habits" component={Habits} />
         <Route path="/alerts" component={Alerts} />
         <Route component={NotFound} />
       </Switch>

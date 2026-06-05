@@ -1,0 +1,1 @@
+- [Orval hook data typing](orval-hook-data-typing.md) — typing props as `ReturnType<typeof useGetX>["data"]` collapses to `{}`; import the generated response type instead. Rebuild api-client-react dist after codegen.

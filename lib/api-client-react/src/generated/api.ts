@@ -32,6 +32,9 @@ import type {
   GetAveragesParams,
   GetSubmissionRateParams,
   GradeBreakdown,
+  HabitAlert,
+  HabitAlertStatusInput,
+  HabitsReport,
   HealthStatus,
   HeatmapReport,
   MissedAssignment,
@@ -1104,6 +1107,157 @@ export function useGetHeatmap<TData = Awaited<ReturnType<typeof getHeatmap>>, TE
 
 
 
+
+export const getGetHabitsUrl = (studentId: number,) => {
+
+
+
+
+  return `/api/habits/${studentId}`
+}
+
+/**
+ * @summary Learning habit tracking — daily study summary, weekly consistency, average session duration, productive hours, submission habits, trends and inconsistency alerts
+ */
+export const getHabits = async (studentId: number, options?: RequestInit): Promise<HabitsReport> => {
+
+  return customFetch<HabitsReport>(getGetHabitsUrl(studentId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetHabitsQueryKey = (studentId: number,) => {
+    return [
+    `/api/habits/${studentId}`
+    ] as const;
+    }
+
+
+export const getGetHabitsQueryOptions = <TData = Awaited<ReturnType<typeof getHabits>>, TError = ErrorType<unknown>>(studentId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getHabits>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetHabitsQueryKey(studentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getHabits>>> = ({ signal }) => getHabits(studentId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(studentId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getHabits>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetHabitsQueryResult = NonNullable<Awaited<ReturnType<typeof getHabits>>>
+export type GetHabitsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Learning habit tracking — daily study summary, weekly consistency, average session duration, productive hours, submission habits, trends and inconsistency alerts
+ */
+
+export function useGetHabits<TData = Awaited<ReturnType<typeof getHabits>>, TError = ErrorType<unknown>>(
+ studentId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getHabits>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetHabitsQueryOptions(studentId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateHabitAlertStatusUrl = (studentId: number,
+    alertId: number,) => {
+
+
+
+
+  return `/api/habits/${studentId}/alerts/${alertId}`
+}
+
+/**
+ * @summary Update the status of a learning-habit alert (e.g. dismiss)
+ */
+export const updateHabitAlertStatus = async (studentId: number,
+    alertId: number,
+    habitAlertStatusInput: HabitAlertStatusInput, options?: RequestInit): Promise<HabitAlert> => {
+
+  return customFetch<HabitAlert>(getUpdateHabitAlertStatusUrl(studentId,alertId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      habitAlertStatusInput,)
+  }
+);}
+
+
+
+
+export const getUpdateHabitAlertStatusMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateHabitAlertStatus>>, TError,{studentId: number;alertId: number;data: BodyType<HabitAlertStatusInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateHabitAlertStatus>>, TError,{studentId: number;alertId: number;data: BodyType<HabitAlertStatusInput>}, TContext> => {
+
+const mutationKey = ['updateHabitAlertStatus'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateHabitAlertStatus>>, {studentId: number;alertId: number;data: BodyType<HabitAlertStatusInput>}> = (props) => {
+          const {studentId,alertId,data} = props ?? {};
+
+          return  updateHabitAlertStatus(studentId,alertId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateHabitAlertStatusMutationResult = NonNullable<Awaited<ReturnType<typeof updateHabitAlertStatus>>>
+    export type UpdateHabitAlertStatusMutationBody = BodyType<HabitAlertStatusInput>
+    export type UpdateHabitAlertStatusMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update the status of a learning-habit alert (e.g. dismiss)
+ */
+export const useUpdateHabitAlertStatus = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateHabitAlertStatus>>, TError,{studentId: number;alertId: number;data: BodyType<HabitAlertStatusInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateHabitAlertStatus>>,
+        TError,
+        {studentId: number;alertId: number;data: BodyType<HabitAlertStatusInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateHabitAlertStatusMutationOptions(options));
+    }
 
 export const getUpdateSubmissionGoalUrl = (studentId: number,) => {
 

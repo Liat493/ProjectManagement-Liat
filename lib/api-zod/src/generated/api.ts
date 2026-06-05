@@ -368,6 +368,115 @@ export const GetHeatmapResponse = zod.object({
 })
 
 
+/**
+ * @summary Learning habit tracking — daily study summary, weekly consistency, average session duration, productive hours, submission habits, trends and inconsistency alerts
+ */
+export const GetHabitsParams = zod.object({
+  "studentId": zod.coerce.number()
+})
+
+export const GetHabitsResponse = zod.object({
+  "dailySummary": zod.object({
+  "totalMinutes": zod.number().describe('Total valid study minutes today.'),
+  "sessionCount": zod.number(),
+  "averageMinutes": zod.number().nullable(),
+  "lastActivityAt": zod.string().nullable().describe('ISO timestamp of the most recent study session.')
+}),
+  "weeklyConsistency": zod.object({
+  "activeDays": zod.number().describe('Days with >=1 valid session in the last 7 days.'),
+  "inactiveDays": zod.number(),
+  "totalDaysStudied": zod.number().describe('All-time distinct days with study activity.'),
+  "currentStreak": zod.number().describe('Consecutive active days ending today.'),
+  "pattern": zod.array(zod.object({
+  "date": zod.string().describe('YYYY-MM-DD'),
+  "label": zod.string().describe('Short weekday label, e.g. Mon'),
+  "active": zod.boolean(),
+  "minutes": zod.number(),
+  "sessions": zod.number()
+}))
+}),
+  "averageDurations": zod.object({
+  "daily": zod.number().nullable().describe('Avg session duration (min) today.'),
+  "weekly": zod.number().nullable().describe('Avg session duration (min) over the last 7 days.'),
+  "monthly": zod.number().nullable().describe('Avg session duration (min) over the last 30 days.')
+}),
+  "productiveHours": zod.array(zod.object({
+  "hour": zod.number().describe('Hour of day 0-23.'),
+  "totalMinutes": zod.number(),
+  "sessionCount": zod.number()
+})),
+  "peakHours": zod.array(zod.number()).describe('Hours (0-23) with the highest total study minutes.'),
+  "submissionHabits": zod.object({
+  "overall": zod.object({
+  "total": zod.number().describe('Assignments considered (due).'),
+  "onTime": zod.number(),
+  "late": zod.number(),
+  "submissionRate": zod.number().describe('Percentage submitted (on-time + late) of total.')
+}),
+  "byCourse": zod.array(zod.object({
+  "courseId": zod.number(),
+  "courseName": zod.string(),
+  "total": zod.number(),
+  "onTime": zod.number(),
+  "late": zod.number(),
+  "submissionRate": zod.number()
+}))
+}),
+  "trends": zod.object({
+  "daily": zod.array(zod.object({
+  "label": zod.string(),
+  "minutes": zod.number(),
+  "sessions": zod.number()
+})),
+  "weekly": zod.array(zod.object({
+  "label": zod.string(),
+  "minutes": zod.number(),
+  "sessions": zod.number()
+})),
+  "monthly": zod.array(zod.object({
+  "label": zod.string(),
+  "minutes": zod.number(),
+  "sessions": zod.number()
+}))
+}),
+  "alerts": zod.array(zod.object({
+  "id": zod.number(),
+  "alertType": zod.enum(['inactivity', 'duration_drop', 'consistency_decline']),
+  "title": zod.string(),
+  "message": zod.string(),
+  "severity": zod.enum(['low', 'medium', 'high']),
+  "status": zod.enum(['active', 'dismissed']),
+  "userStory": zod.string(),
+  "createdAt": zod.string()
+})),
+  "generatedAt": zod.string()
+})
+
+
+/**
+ * @summary Update the status of a learning-habit alert (e.g. dismiss)
+ */
+export const UpdateHabitAlertStatusParams = zod.object({
+  "studentId": zod.coerce.number(),
+  "alertId": zod.coerce.number()
+})
+
+export const UpdateHabitAlertStatusBody = zod.object({
+  "status": zod.enum(['active', 'dismissed'])
+})
+
+export const UpdateHabitAlertStatusResponse = zod.object({
+  "id": zod.number(),
+  "alertType": zod.enum(['inactivity', 'duration_drop', 'consistency_decline']),
+  "title": zod.string(),
+  "message": zod.string(),
+  "severity": zod.enum(['low', 'medium', 'high']),
+  "status": zod.enum(['active', 'dismissed']),
+  "userStory": zod.string(),
+  "createdAt": zod.string()
+})
+
+
 export const UpdateSubmissionGoalParams = zod.object({
   "studentId": zod.coerce.number()
 })
