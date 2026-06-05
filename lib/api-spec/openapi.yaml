@@ -16,6 +16,7 @@ tags:
   - name: courses
   - name: attendance
   - name: alerts
+  - name: heatmap
 paths:
   /healthz:
     get:
@@ -284,6 +285,22 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/RiskAlert" }
+  /heatmap/{studentId}:
+    get:
+      operationId: getHeatmap
+      tags: [heatmap]
+      summary: Heatmap analytics — attendance and grade performance per course over time, with strong/weak identification, class comparison and recommendations
+      parameters:
+        - in: path
+          name: studentId
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Heatmap analytics report
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/HeatmapReport" }
   /submissions/{studentId}/goal:
     put:
       operationId: updateSubmissionGoal
@@ -650,3 +667,89 @@ components:
       required: [status]
       properties:
         status: { type: string, enum: [active, resolved, dismissed] }
+    HeatmapPeriod:
+      type: object
+      required: [key, label]
+      properties:
+        key: { type: string, description: "Period key, e.g. 2026-01" }
+        label: { type: string, description: "Short display label, e.g. Jan" }
+    HeatmapCell:
+      type: object
+      required: [periodKey, value, level]
+      properties:
+        periodKey: { type: string }
+        value:
+          type: ["number", "null"]
+          description: "0-100 metric for the period (attendance % or average grade); null when no data."
+        level:
+          type: string
+          description: "Performance band for colour mapping."
+          enum: [excellent, good, average, needs_improvement, weak, none]
+    HeatmapCourse:
+      type: object
+      required:
+        - courseId
+        - courseName
+        - overallGrade
+        - performanceLevel
+        - strength
+        - classAverage
+        - gradeDifference
+        - comparisonStatus
+        - overallAttendance
+        - attendanceLevel
+        - gradeCells
+        - attendanceCells
+      properties:
+        courseId: { type: integer }
+        courseName: { type: string }
+        overallGrade: { type: ["number", "null"] }
+        performanceLevel:
+          type: string
+          enum: [excellent, good, average, needs_improvement, weak, none]
+        strength:
+          type: string
+          description: "Relative to the student's own overall average."
+          enum: [strong, weak, normal, none]
+        classAverage: { type: ["number", "null"] }
+        gradeDifference: { type: ["number", "null"] }
+        comparisonStatus: { type: string, enum: [Above, Below, Close, "No Data"] }
+        overallAttendance: { type: ["number", "null"] }
+        attendanceLevel:
+          type: string
+          enum: [excellent, good, average, needs_improvement, weak, none]
+        gradeCells:
+          type: array
+          items: { $ref: "#/components/schemas/HeatmapCell" }
+        attendanceCells:
+          type: array
+          items: { $ref: "#/components/schemas/HeatmapCell" }
+    HeatmapRecommendation:
+      type: object
+      required: [id, type, courseName, title, message]
+      properties:
+        id: { type: string }
+        type: { type: string, description: "weak_course | low_attendance | strong_course" }
+        courseName: { type: ["string", "null"] }
+        title: { type: string }
+        message: { type: string }
+    HeatmapReport:
+      type: object
+      required:
+        - periods
+        - courses
+        - studentOverallAverage
+        - recommendations
+        - generatedAt
+      properties:
+        periods:
+          type: array
+          items: { $ref: "#/components/schemas/HeatmapPeriod" }
+        courses:
+          type: array
+          items: { $ref: "#/components/schemas/HeatmapCourse" }
+        studentOverallAverage: { type: ["number", "null"] }
+        recommendations:
+          type: array
+          items: { $ref: "#/components/schemas/HeatmapRecommendation" }
+        generatedAt: { type: string }

@@ -7,6 +7,7 @@ import {
   CalendarClock,
   Target,
   ShieldAlert,
+  Grid3x3,
   GraduationCap as StudentIcon,
   LogOut,
 } from "lucide-react";
@@ -23,6 +24,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     { href: "/averages", label: "Grade Averages", icon: GraduationCap },
     { href: "/schedule", label: "Weekly Schedule", icon: CalendarClock },
     { href: "/submissions", label: "Submission Rates", icon: Target },
+    { href: "/heatmap", label: "Heatmap Analytics", icon: Grid3x3 },
     { href: "/alerts", label: "Risk Alerts", icon: ShieldAlert },
   ];
 

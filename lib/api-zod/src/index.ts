@@ -29,3 +29,8 @@ export type { RiskAlert } from "./generated/types/riskAlert";
 export type { AlertSummary } from "./generated/types/alertSummary";
 export type { AlertsReport } from "./generated/types/alertsReport";
 export type { AlertStatusInput } from "./generated/types/alertStatusInput";
+export type { HeatmapPeriod } from "./generated/types/heatmapPeriod";
+export type { HeatmapCell } from "./generated/types/heatmapCell";
+export type { HeatmapCourse } from "./generated/types/heatmapCourse";
+export type { HeatmapRecommendation } from "./generated/types/heatmapRecommendation";
+export type { HeatmapReport } from "./generated/types/heatmapReport";

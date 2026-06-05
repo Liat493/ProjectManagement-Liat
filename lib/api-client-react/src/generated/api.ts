@@ -33,6 +33,7 @@ import type {
   GetSubmissionRateParams,
   GradeBreakdown,
   HealthStatus,
+  HeatmapReport,
   MissedAssignment,
   RiskAlert,
   SubmissionGoal,
@@ -1026,6 +1027,83 @@ export const useUpdateAlertStatus = <TError = ErrorType<unknown>,
       > => {
       return useMutation(getUpdateAlertStatusMutationOptions(options));
     }
+
+export const getGetHeatmapUrl = (studentId: number,) => {
+
+
+
+
+  return `/api/heatmap/${studentId}`
+}
+
+/**
+ * @summary Heatmap analytics — attendance and grade performance per course over time, with strong/weak identification, class comparison and recommendations
+ */
+export const getHeatmap = async (studentId: number, options?: RequestInit): Promise<HeatmapReport> => {
+
+  return customFetch<HeatmapReport>(getGetHeatmapUrl(studentId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetHeatmapQueryKey = (studentId: number,) => {
+    return [
+    `/api/heatmap/${studentId}`
+    ] as const;
+    }
+
+
+export const getGetHeatmapQueryOptions = <TData = Awaited<ReturnType<typeof getHeatmap>>, TError = ErrorType<unknown>>(studentId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getHeatmap>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetHeatmapQueryKey(studentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getHeatmap>>> = ({ signal }) => getHeatmap(studentId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(studentId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getHeatmap>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetHeatmapQueryResult = NonNullable<Awaited<ReturnType<typeof getHeatmap>>>
+export type GetHeatmapQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Heatmap analytics — attendance and grade performance per course over time, with strong/weak identification, class comparison and recommendations
+ */
+
+export function useGetHeatmap<TData = Awaited<ReturnType<typeof getHeatmap>>, TError = ErrorType<unknown>>(
+ studentId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getHeatmap>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetHeatmapQueryOptions(studentId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export const getUpdateSubmissionGoalUrl = (studentId: number,) => {
 

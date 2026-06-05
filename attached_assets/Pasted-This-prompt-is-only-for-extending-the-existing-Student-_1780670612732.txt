@@ -1,0 +1,103 @@
+This prompt is only for extending the existing Student Academic Analytics system.
+
+Add the Heatmap Analytics feature according to the requirements below.
+
+Critical rules:
+- Do not rebuild the application.
+- Do not rewrite, remove, rename, duplicate, or break any existing feature, component, route, API, database table, database field, or UI behavior.
+- Preserve all existing features:
+  Dashboard, Average Grade, Comparison to Class Average, Submission Rate, Weekly Submission Schedule, and Risk Alerts.
+- Before creating anything new, inspect the existing code/data and reuse existing students, courses, grades, attendance, class averages, assignments, submissions, UI components, styling, and services where possible.
+- Add only what is required to fully implement Heatmap Analytics.
+- Do not add unnecessary pages, duplicate widgets, duplicate analytics logic, or unrelated features.
+- Do not perform general refactoring.
+- Do not make destructive database changes.
+- If data/database support is missing, add only minimal safe demo data or fields required for this feature.
+- Keep the feature part of the student-side analytics dashboard.
+- Keep the UI consistent with the existing design.
+
+Feature: Heatmap Analytics
+
+Implement the following User Stories:
+
+US1 – Attendance Heatmap
+- Display student attendance data in a heatmap format.
+- Each course should appear as a row.
+- Time periods such as weeks or months should appear as columns.
+- Attendance percentages should be visualized by intensity.
+- Retrieve attendance data dynamically from the existing database/data structure.
+- Handle missing attendance data gracefully.
+
+US2 – Strong Course Identification
+- Analyze student grades per course.
+- Calculate performance levels dynamically.
+- Identify courses where the student performs significantly above the student’s overall average.
+- Highlight strong courses in the heatmap.
+- Add tooltip/details with exact performance values.
+
+US3 – Weak Course Identification
+- Analyze student grades per course.
+- Detect courses where performance is significantly below the student’s overall average.
+- Mark weak courses visually in the heatmap.
+- Display warning indicators for weak areas.
+
+US4 – Performance Color Mapping
+- Use a clear performance scale:
+  Dark Green = Excellent
+  Light Green = Good
+  Yellow = Average
+  Orange = Needs Improvement
+  Red = Weak
+- Add a visible legend.
+- Keep color usage consistent.
+- Do not rely only on color; add labels, icons, badges, or tooltips where useful.
+
+US5 – Category Filtering
+- Add filter controls above the heatmap.
+- Allow switching between Attendance View and Grades View.
+- Update the heatmap dynamically without page refresh.
+- Keep the layout responsive.
+
+US6 – Class Average Comparison
+- Reuse existing class average data/logic if already available.
+- Compare the student’s performance against class averages per course.
+- Show comparison indicators inside the heatmap.
+- Add tooltip/details with:
+  student value,
+  class average,
+  difference percentage.
+- Do not duplicate or replace the existing Comparison to Class Average feature.
+
+US7 – Heatmap-Based Recommendations
+- Analyze weak courses and attendance patterns from the heatmap data.
+- Generate simple recommendations based only on Heatmap Analytics insights.
+- Display them in a Recommendations panel below the heatmap.
+- Do not build the full Smart Recommendations module yet.
+- Do not duplicate or rewrite Risk Alerts.
+- Recommendations should be generated from real/demo data, not hardcoded UI text.
+
+Technical requirements:
+- Use the existing architecture, folder structure, styling, and UI patterns.
+- Add loading, empty, and error states.
+- Ensure responsive behavior.
+- Add validation for missing/incomplete data.
+- Add tests or manual validation steps if the project structure supports it.
+
+Demo data requirement:
+Make sure the demo student has realistic data that demonstrates:
+- attendance heatmap,
+- grades heatmap,
+- at least one strong course,
+- at least one weak course,
+- class average comparison,
+- at least one heatmap-based recommendation.
+
+Do not hardcode the result. The UI must display insights generated from the data.
+
+After implementation, provide a short report:
+1. Files changed
+2. Files added
+3. Database/demo data changes
+4. How US1–US7 were implemented
+5. How to test Heatmap Analytics
+6. Confirmation that existing features still work

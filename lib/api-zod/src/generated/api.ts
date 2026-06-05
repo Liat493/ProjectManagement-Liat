@@ -322,6 +322,52 @@ export const UpdateAlertStatusResponse = zod.object({
 })
 
 
+/**
+ * @summary Heatmap analytics — attendance and grade performance per course over time, with strong/weak identification, class comparison and recommendations
+ */
+export const GetHeatmapParams = zod.object({
+  "studentId": zod.coerce.number()
+})
+
+export const GetHeatmapResponse = zod.object({
+  "periods": zod.array(zod.object({
+  "key": zod.string().describe('Period key, e.g. 2026-01'),
+  "label": zod.string().describe('Short display label, e.g. Jan')
+})),
+  "courses": zod.array(zod.object({
+  "courseId": zod.number(),
+  "courseName": zod.string(),
+  "overallGrade": zod.number().nullable(),
+  "performanceLevel": zod.enum(['excellent', 'good', 'average', 'needs_improvement', 'weak', 'none']),
+  "strength": zod.enum(['strong', 'weak', 'normal', 'none']).describe('Relative to the student\'s own overall average.'),
+  "classAverage": zod.number().nullable(),
+  "gradeDifference": zod.number().nullable(),
+  "comparisonStatus": zod.enum(['Above', 'Below', 'Close', 'No Data']),
+  "overallAttendance": zod.number().nullable(),
+  "attendanceLevel": zod.enum(['excellent', 'good', 'average', 'needs_improvement', 'weak', 'none']),
+  "gradeCells": zod.array(zod.object({
+  "periodKey": zod.string(),
+  "value": zod.number().nullable().describe('0-100 metric for the period (attendance % or average grade); null when no data.'),
+  "level": zod.enum(['excellent', 'good', 'average', 'needs_improvement', 'weak', 'none']).describe('Performance band for colour mapping.')
+})),
+  "attendanceCells": zod.array(zod.object({
+  "periodKey": zod.string(),
+  "value": zod.number().nullable().describe('0-100 metric for the period (attendance % or average grade); null when no data.'),
+  "level": zod.enum(['excellent', 'good', 'average', 'needs_improvement', 'weak', 'none']).describe('Performance band for colour mapping.')
+}))
+})),
+  "studentOverallAverage": zod.number().nullable(),
+  "recommendations": zod.array(zod.object({
+  "id": zod.string(),
+  "type": zod.string().describe('weak_course | low_attendance | strong_course'),
+  "courseName": zod.string().nullable(),
+  "title": zod.string(),
+  "message": zod.string()
+})),
+  "generatedAt": zod.string()
+})
+
+
 export const UpdateSubmissionGoalParams = zod.object({
   "studentId": zod.coerce.number()
 })

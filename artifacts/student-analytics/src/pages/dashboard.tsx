@@ -26,6 +26,7 @@ import {
   ShieldAlert,
   ShieldCheck,
   Lightbulb,
+  Grid3x3,
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { PageHeader } from "@/components/page-header";
@@ -225,6 +226,12 @@ export default function Dashboard() {
             title="Class Comparison"
             description="Compare your performance to the class."
             icon={Users}
+          />
+          <ModuleCard
+            href="/heatmap"
+            title="Heatmap Analytics"
+            description="See attendance and grade patterns at a glance."
+            icon={Grid3x3}
           />
         </div>
       </section>

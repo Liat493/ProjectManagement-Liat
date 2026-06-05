@@ -240,6 +240,125 @@ export interface AlertStatusInput {
   status: AlertStatusInputStatus;
 }
 
+export interface HeatmapPeriod {
+  /** Period key, e.g. 2026-01 */
+  key: string;
+  /** Short display label, e.g. Jan */
+  label: string;
+}
+
+/**
+ * Performance band for colour mapping.
+ */
+export type HeatmapCellLevel = typeof HeatmapCellLevel[keyof typeof HeatmapCellLevel];
+
+
+export const HeatmapCellLevel = {
+  excellent: 'excellent',
+  good: 'good',
+  average: 'average',
+  needs_improvement: 'needs_improvement',
+  weak: 'weak',
+  none: 'none',
+} as const;
+
+export interface HeatmapCell {
+  periodKey: string;
+  /**
+     * 0-100 metric for the period (attendance % or average grade); null when no data.
+     * @nullable
+     */
+  value: number | null;
+  /** Performance band for colour mapping. */
+  level: HeatmapCellLevel;
+}
+
+export type HeatmapCoursePerformanceLevel = typeof HeatmapCoursePerformanceLevel[keyof typeof HeatmapCoursePerformanceLevel];
+
+
+export const HeatmapCoursePerformanceLevel = {
+  excellent: 'excellent',
+  good: 'good',
+  average: 'average',
+  needs_improvement: 'needs_improvement',
+  weak: 'weak',
+  none: 'none',
+} as const;
+
+/**
+ * Relative to the student's own overall average.
+ */
+export type HeatmapCourseStrength = typeof HeatmapCourseStrength[keyof typeof HeatmapCourseStrength];
+
+
+export const HeatmapCourseStrength = {
+  strong: 'strong',
+  weak: 'weak',
+  normal: 'normal',
+  none: 'none',
+} as const;
+
+export type HeatmapCourseComparisonStatus = typeof HeatmapCourseComparisonStatus[keyof typeof HeatmapCourseComparisonStatus];
+
+
+export const HeatmapCourseComparisonStatus = {
+  Above: 'Above',
+  Below: 'Below',
+  Close: 'Close',
+  No_Data: 'No Data',
+} as const;
+
+export type HeatmapCourseAttendanceLevel = typeof HeatmapCourseAttendanceLevel[keyof typeof HeatmapCourseAttendanceLevel];
+
+
+export const HeatmapCourseAttendanceLevel = {
+  excellent: 'excellent',
+  good: 'good',
+  average: 'average',
+  needs_improvement: 'needs_improvement',
+  weak: 'weak',
+  none: 'none',
+} as const;
+
+export interface HeatmapCourse {
+  courseId: number;
+  courseName: string;
+  /** @nullable */
+  overallGrade: number | null;
+  performanceLevel: HeatmapCoursePerformanceLevel;
+  /** Relative to the student's own overall average. */
+  strength: HeatmapCourseStrength;
+  /** @nullable */
+  classAverage: number | null;
+  /** @nullable */
+  gradeDifference: number | null;
+  comparisonStatus: HeatmapCourseComparisonStatus;
+  /** @nullable */
+  overallAttendance: number | null;
+  attendanceLevel: HeatmapCourseAttendanceLevel;
+  gradeCells: HeatmapCell[];
+  attendanceCells: HeatmapCell[];
+}
+
+export interface HeatmapRecommendation {
+  id: string;
+  /** weak_course | low_attendance | strong_course */
+  type: string;
+  /** @nullable */
+  courseName: string | null;
+  title: string;
+  message: string;
+}
+
+export interface HeatmapReport {
+  periods: HeatmapPeriod[];
+  courses: HeatmapCourse[];
+  /** @nullable */
+  studentOverallAverage: number | null;
+  recommendations: HeatmapRecommendation[];
+  generatedAt: string;
+}
+
 export type GetAveragesParams = {
 /**
  * Filter averages to a single semester. Defaults to all semesters.
