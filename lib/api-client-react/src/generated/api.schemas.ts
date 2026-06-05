@@ -190,6 +190,56 @@ export interface SubmissionGoalInput {
   targetRate: number;
 }
 
+export interface RiskAlert {
+  id: number;
+  studentId: number;
+  alertType: string;
+  /** @nullable */
+  courseId: number | null;
+  /** @nullable */
+  courseName: string | null;
+  title: string;
+  message: string;
+  severity: string;
+  status: string;
+  recommendation: string;
+  userStory: string;
+  /** @nullable */
+  riskScore: number | null;
+  createdAt: string;
+}
+
+export interface AlertSummary {
+  active: number;
+  high: number;
+  medium: number;
+  low: number;
+  resolved: number;
+  dismissed: number;
+}
+
+export interface AlertsReport {
+  summary: AlertSummary;
+  alerts: RiskAlert[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+export type AlertStatusInputStatus = typeof AlertStatusInputStatus[keyof typeof AlertStatusInputStatus];
+
+
+export const AlertStatusInputStatus = {
+  active: 'active',
+  resolved: 'resolved',
+  dismissed: 'dismissed',
+} as const;
+
+export interface AlertStatusInput {
+  status: AlertStatusInputStatus;
+}
+
 export type GetAveragesParams = {
 /**
  * Filter averages to a single semester. Defaults to all semesters.
@@ -203,4 +253,76 @@ export type GetSubmissionRateParams = {
  */
 courseId?: number;
 };
+
+export type GetAlertsParams = {
+/**
+ * Filter by alert status. Defaults to all statuses.
+ */
+status?: GetAlertsStatus;
+/**
+ * Filter by alert type.
+ */
+alertType?: string;
+/**
+ * Filter by severity.
+ */
+severity?: GetAlertsSeverity;
+/**
+ * Filter to a single course.
+ */
+courseId?: number;
+/**
+ * Sort field. Defaults to date.
+ */
+sortBy?: GetAlertsSortBy;
+/**
+ * Sort direction. Defaults to desc.
+ */
+sortDir?: GetAlertsSortDir;
+/**
+ * 1-based page number. Defaults to 1.
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Items per page. Defaults to 10.
+ * @minimum 1
+ * @maximum 100
+ */
+pageSize?: number;
+};
+
+export type GetAlertsStatus = typeof GetAlertsStatus[keyof typeof GetAlertsStatus];
+
+
+export const GetAlertsStatus = {
+  active: 'active',
+  resolved: 'resolved',
+  dismissed: 'dismissed',
+} as const;
+
+export type GetAlertsSeverity = typeof GetAlertsSeverity[keyof typeof GetAlertsSeverity];
+
+
+export const GetAlertsSeverity = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+} as const;
+
+export type GetAlertsSortBy = typeof GetAlertsSortBy[keyof typeof GetAlertsSortBy];
+
+
+export const GetAlertsSortBy = {
+  date: 'date',
+  severity: 'severity',
+} as const;
+
+export type GetAlertsSortDir = typeof GetAlertsSortDir[keyof typeof GetAlertsSortDir];
+
+
+export const GetAlertsSortDir = {
+  asc: 'asc',
+  desc: 'desc',
+} as const;
 

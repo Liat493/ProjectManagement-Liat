@@ -1,6 +1,11 @@
 import React from "react";
 import { Link } from "wouter";
-import { useGetDashboard, getGetDashboardQueryKey } from "@workspace/api-client-react";
+import {
+  useGetDashboard,
+  getGetDashboardQueryKey,
+  useGetAlerts,
+  getGetAlertsQueryKey,
+} from "@workspace/api-client-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -18,6 +23,9 @@ import {
   Users,
   ArrowRight,
   UserCheck,
+  ShieldAlert,
+  ShieldCheck,
+  Lightbulb,
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { PageHeader } from "@/components/page-header";
@@ -186,6 +194,8 @@ export default function Dashboard() {
         </Link>
       </div>
 
+      <RiskAlertsWidget studentId={studentId} />
+
       <section className="space-y-4">
         <div>
           <h2 className="text-xl font-semibold text-foreground">Explore Modules</h2>
@@ -266,6 +276,111 @@ function StatCard({
         </CardContent>
       </Card>
     </Link>
+  );
+}
+
+function RiskAlertsWidget({ studentId }: { studentId: number }) {
+  const params = {
+    status: "active" as const,
+    sortBy: "severity" as const,
+    sortDir: "desc" as const,
+    page: 1,
+    pageSize: 3,
+  };
+  const { data, isLoading, isError } = useGetAlerts(studentId, params, {
+    query: { queryKey: getGetAlertsQueryKey(studentId, params) },
+  });
+
+  const sevStyle: Record<string, string> = {
+    high: "bg-destructive/10 text-destructive border border-destructive/20",
+    medium:
+      "bg-amber-100 text-amber-800 border border-amber-200 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-900/50",
+    low: "bg-blue-100 text-blue-800 border border-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-900/50",
+  };
+
+  return (
+    <section className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
+            <ShieldAlert className="h-5 w-5 text-primary" /> Risk Alerts
+          </h2>
+          {data && data.summary.active > 0 && (
+            <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-destructive/10 text-destructive">
+              {data.summary.active} active
+            </span>
+          )}
+        </div>
+        <Link href="/alerts">
+          <span className="text-sm font-medium text-primary hover:underline flex items-center gap-1 cursor-pointer">
+            View all <ArrowRight className="h-4 w-4" />
+          </span>
+        </Link>
+      </div>
+
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-32 rounded-xl" />
+          ))}
+        </div>
+      ) : isError || !data ? (
+        <Card>
+          <CardContent className="p-5 text-sm text-muted-foreground">
+            Risk alerts are unavailable right now.
+          </CardContent>
+        </Card>
+      ) : data.alerts.length === 0 ? (
+        <Card>
+          <CardContent className="p-6 flex items-center gap-3">
+            <div className="p-2.5 rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400">
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="font-semibold text-foreground">No active risk alerts</p>
+              <p className="text-sm text-muted-foreground">
+                You are on track across grades, attendance and submissions.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {data.alerts.map((a) => (
+            <Card key={a.id} className="flex flex-col h-full">
+              <CardContent className="p-5 flex flex-col gap-3 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-xs font-semibold capitalize ${sevStyle[a.severity] ?? sevStyle.low}`}
+                  >
+                    {a.severity}
+                  </span>
+                  {a.courseName && (
+                    <span className="text-xs text-muted-foreground line-clamp-1">
+                      {a.courseName}
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground leading-snug line-clamp-2">
+                    {a.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                    {a.message}
+                  </p>
+                </div>
+                <div className="mt-auto flex items-start gap-2 rounded-lg bg-primary/5 border border-primary/10 p-2.5">
+                  <Lightbulb className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <p className="text-xs text-foreground/90 line-clamp-2">
+                    {a.recommendation}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </section>
   );
 }
 

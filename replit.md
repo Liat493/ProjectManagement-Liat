@@ -22,7 +22,12 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- DB schema (source of truth): `lib/db/src/schema/index.ts` (Drizzle). Includes `riskAlertsTable`.
+- API contract (source of truth): `lib/api-spec/openapi.yaml`. Run codegen after editing (see Run & Operate).
+- Generated client hooks/types: `@workspace/api-client-react`; server Zod schemas: `@workspace/api-zod`.
+- API routes: `artifacts/api-server/src/routes/*` (registered in `routes/index.ts`, ownership-scoped via `ownStudentParam`).
+- Risk Alerts engine: `artifacts/api-server/src/lib/alerts.ts`; routes in `routes/alerts.ts`.
+- Frontend pages: `artifacts/student-analytics/src/pages/*`; nav in `components/layout.tsx`; routes in `App.tsx`.
 
 ## Architecture decisions
 
@@ -30,7 +35,10 @@ _Populate as you build — non-obvious choices a reader couldn't infer from the 
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+Student-side academic analytics ("Smart Learning System"). Capabilities:
+- Dashboard with key stats (overall average, submission rate, attendance, due-this-week) + module shortcuts.
+- Grade Averages, Class Comparison, Submission Rate, Weekly Schedule.
+- Risk Alerts (Sprint 3): early-warning engine over existing grades/attendance/submissions/assignments. Alert types map to user stories — US1 low grade, US2 low attendance, US3 declining grade trend, US4 missing/late submission, US5 high-risk course (composite risk score). Every alert carries a recommendation (US7). Persistent history with resolve/dismiss/reactivate; dashboard widget + Alert History page with filter/sort/pagination (US6).
 
 ## User preferences
 
@@ -38,7 +46,9 @@ _Populate as you build — explicit user instructions worth remembering across s
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- DB schema changes: `drizzle-kit push` needs a TTY and fails non-interactively here. Apply DDL via raw SQL (executeSql) and keep `lib/db/src/schema/index.ts` in sync.
+- After editing `lib/api-spec/openapi.yaml`, re-run codegen AND add matching type re-exports to the `@workspace/api-zod` barrel (`lib/api-zod/src/index.ts`) — they are not auto-generated.
+- Risk alerts dedupe/persistence relies on the unique index `(student_id, alert_type, related_key)` + `onConflictDoNothing`. `related_key` must be a stable identifier (e.g. `grade:{id}`, `missing:{assignmentId}`) so resolved/dismissed alerts are never recreated.
 
 ## Pointers
 

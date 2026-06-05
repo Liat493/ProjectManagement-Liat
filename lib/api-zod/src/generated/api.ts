@@ -239,6 +239,89 @@ export const GetMissedAssignmentsResponseItem = zod.object({
 export const GetMissedAssignmentsResponse = zod.array(GetMissedAssignmentsResponseItem)
 
 
+/**
+ * @summary List risk alerts (generates fresh alerts, then returns filtered/sorted/paginated results)
+ */
+export const GetAlertsParams = zod.object({
+  "studentId": zod.coerce.number()
+})
+
+
+export const getAlertsQueryPageSizeMax = 100;
+
+
+
+export const GetAlertsQueryParams = zod.object({
+  "status": zod.enum(['active', 'resolved', 'dismissed']).optional().describe('Filter by alert status. Defaults to all statuses.'),
+  "alertType": zod.coerce.string().optional().describe('Filter by alert type.'),
+  "severity": zod.enum(['low', 'medium', 'high']).optional().describe('Filter by severity.'),
+  "courseId": zod.coerce.number().optional().describe('Filter to a single course.'),
+  "sortBy": zod.enum(['date', 'severity']).optional().describe('Sort field. Defaults to date.'),
+  "sortDir": zod.enum(['asc', 'desc']).optional().describe('Sort direction. Defaults to desc.'),
+  "page": zod.coerce.number().min(1).optional().describe('1-based page number. Defaults to 1.'),
+  "pageSize": zod.coerce.number().min(1).max(getAlertsQueryPageSizeMax).optional().describe('Items per page. Defaults to 10.')
+})
+
+export const GetAlertsResponse = zod.object({
+  "summary": zod.object({
+  "active": zod.number(),
+  "high": zod.number(),
+  "medium": zod.number(),
+  "low": zod.number(),
+  "resolved": zod.number(),
+  "dismissed": zod.number()
+}),
+  "alerts": zod.array(zod.object({
+  "id": zod.number(),
+  "studentId": zod.number(),
+  "alertType": zod.string(),
+  "courseId": zod.number().nullable(),
+  "courseName": zod.string().nullable(),
+  "title": zod.string(),
+  "message": zod.string(),
+  "severity": zod.string(),
+  "status": zod.string(),
+  "recommendation": zod.string(),
+  "userStory": zod.string(),
+  "riskScore": zod.number().nullable(),
+  "createdAt": zod.string()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "pageSize": zod.number(),
+  "totalPages": zod.number()
+})
+
+
+/**
+ * @summary Update an alert's status (mark resolved or dismissed)
+ */
+export const UpdateAlertStatusParams = zod.object({
+  "studentId": zod.coerce.number(),
+  "alertId": zod.coerce.number()
+})
+
+export const UpdateAlertStatusBody = zod.object({
+  "status": zod.enum(['active', 'resolved', 'dismissed'])
+})
+
+export const UpdateAlertStatusResponse = zod.object({
+  "id": zod.number(),
+  "studentId": zod.number(),
+  "alertType": zod.string(),
+  "courseId": zod.number().nullable(),
+  "courseName": zod.string().nullable(),
+  "title": zod.string(),
+  "message": zod.string(),
+  "severity": zod.string(),
+  "status": zod.string(),
+  "recommendation": zod.string(),
+  "userStory": zod.string(),
+  "riskScore": zod.number().nullable(),
+  "createdAt": zod.string()
+})
+
+
 export const UpdateSubmissionGoalParams = zod.object({
   "studentId": zod.coerce.number()
 })

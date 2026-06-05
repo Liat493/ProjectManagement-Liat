@@ -6,6 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './alertsReport';
+export * from './alertStatusInput';
+export * from './alertStatusInputStatus';
+export * from './alertSummary';
 export * from './assignmentCompleteInput';
 export * from './attendanceCourse';
 export * from './attendanceReport';
@@ -17,12 +21,18 @@ export * from './course';
 export * from './courseAverage';
 export * from './courseSubmissionRate';
 export * from './dashboardSummary';
+export * from './getAlertsParams';
+export * from './getAlertsSeverity';
+export * from './getAlertsSortBy';
+export * from './getAlertsSortDir';
+export * from './getAlertsStatus';
 export * from './getAveragesParams';
 export * from './getSubmissionRateParams';
 export * from './grade';
 export * from './gradeBreakdown';
 export * from './healthStatus';
 export * from './missedAssignment';
+export * from './riskAlert';
 export * from './submissionGoal';
 export * from './submissionGoalInput';
 export * from './submissionRatePoint';

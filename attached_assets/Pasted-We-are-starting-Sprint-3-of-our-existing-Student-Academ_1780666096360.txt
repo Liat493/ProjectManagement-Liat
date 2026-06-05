@@ -1,0 +1,189 @@
+We are starting Sprint 3 of our existing Student Academic Analytics system.
+
+We need to add a new analytics module called "Risk Alerts" based on the full Risk Alerts requirements and User Stories US1–US7.
+
+Important system context:
+The system is a student-side academic analytics system. All features should remain part of the existing Student Academic Analytics product and should be integrated into the existing dashboard/navigation structure.
+
+The following Sprint 2 features are already implemented and must remain fully functional:
+- Average Grade
+- Comparison to Class Average
+- Submission Rate
+- Weekly Submission Schedule
+- Dashboard
+
+Critical instructions:
+1. Do not remove, rewrite, rename, redesign, or break any existing Sprint 2 feature.
+2. Do not make unnecessary changes to existing components, routes, pages, API endpoints, database models, database schema, or existing demo data.
+3. Do not perform a general refactor of the project.
+4. Do not rebuild the dashboard. Only add the minimum required Risk Alerts widget/panel/link while preserving the existing dashboard behavior and layout.
+5. Do not add teacher/admin functionality. This is a student analytics system.
+6. Reuse the existing student, course, grade, attendance, assignment, and submission data/models wherever possible.
+7. If the Risk Alerts module requires additional database support, make only safe and necessary additions:
+   - Add a new risk alerts table/model only if one does not already exist.
+   - Add only required fields for supporting alerts.
+   - Add relevant demo/seed data only if needed to demonstrate the Risk Alerts feature.
+   - Do not delete, rename, or restructure existing DB tables or fields.
+8. Preserve all existing functionality and system behavior.
+9. Keep the UI consistent with the current design of the system.
+
+Feature to implement:
+Add the full "Risk Alerts" analytics module.
+
+General Risk Alerts Requirements:
+- The Risk Alerts module must be fully integrated with the existing dashboard.
+- Alerts must appear in a dedicated Risk Alerts panel/widget on the dashboard.
+- All generated alerts must be stored in the database.
+- Each alert must include:
+  - Alert ID
+  - Student ID, if relevant to the existing schema
+  - Alert Type
+  - Course Name, if relevant
+  - Alert Title
+  - Alert Message
+  - Severity Level: Low / Medium / High
+  - Date Created
+  - Status: Active / Resolved
+  - Recommendation Text
+  - Related User Story ID: US1–US7
+- The module should support future scalability and additional alert types.
+- The module should remain consistent with the existing academic analytics system.
+
+User Story 1 – Real-Time Low Grade Alert:
+- Define a configurable grade threshold.
+- Generate an alert whenever a new grade falls below the threshold.
+- Store low-grade alerts in the database.
+- Display the alert immediately on the dashboard/Risk Alerts panel.
+- Show course name, grade received, and recommended action.
+- Alert severity should increase as grades become lower.
+- If the system does not currently support live grade entry, treat “real-time” as immediate alert generation based on the existing loaded or updated grade data. Do not add a new grade entry UI.
+
+User Story 2 – Attendance Risk Alert:
+- Calculate attendance percentage per course.
+- Define configurable attendance thresholds.
+- Generate alerts when attendance drops below the threshold.
+- Display the current attendance percentage.
+- Show recommendations for improving attendance.
+
+User Story 3 – Declining Performance Trend Alert:
+- Analyze historical grades per course.
+- Detect declining grade trends across multiple assessments.
+- Generate alerts when a consistent downward trend is identified.
+- Display trend information visually or clearly in text.
+- Include recommendations for improvement.
+
+User Story 4 – Missing or Late Submission Alert:
+- Integrate assignment deadlines using existing assignment/submission data where available.
+- Detect assignments not submitted by the due date.
+- Detect late submissions.
+- Generate alerts automatically.
+- Display assignment name, due date, course name if available, and submission status.
+
+User Story 5 – High-Risk Course Alert:
+- Create a clear and simple risk scoring model.
+- Combine grades, attendance, and submissions.
+- Calculate a risk score per course.
+- Classify courses into Low, Medium, and High Risk.
+- Generate alerts for High Risk courses.
+- Display the risk score and contributing factors.
+
+User Story 6 – Alert History:
+- Store all generated alerts.
+- Create a dedicated Alert History page/screen.
+- Allow sorting by:
+  - Date
+  - Severity
+  - Course
+  - Alert Type
+- Allow filtering by alert status.
+- Support pagination for future scalability if it can be implemented safely without affecting existing functionality.
+
+User Story 7 – Recommendations with Alerts:
+- Every alert must include a recommendation.
+- Create recommendation rules for each alert type.
+- Display recommendations clearly in the UI.
+- Recommendations should be actionable and easy for a student to understand.
+
+UI/UX Requirements:
+- Maintain full visual consistency with the existing dashboard.
+- Use a modern academic analytics design.
+- Create a clean, professional, responsive layout.
+- Add a dedicated Risk Alerts dashboard widget.
+- The dashboard widget should show:
+  - Total number of active alerts
+  - Number of High severity alerts
+  - Number of Medium severity alerts
+  - Number of Low severity alerts
+  - Most recent alerts first
+  - Quick navigation to alert details/history
+- Create clear alert cards that include:
+  - Alert icon based on alert type
+  - Course name
+  - Alert title
+  - Alert description
+  - Recommendation summary
+  - Creation date
+  - Severity badge
+  - Status badge
+- Make High severity alerts visually more noticeable than Medium and Low.
+- Display recommendations directly inside the alert card or alert details area.
+- Use a clear “Recommended Action” section.
+- Add a dedicated Alert History screen with:
+  - Filtering by Alert Type, Course, Severity, Status, and Date Range where possible
+  - Sorting by Date, Severity, Course, and Alert Type
+  - Search functionality if it can be added safely
+  - Pagination if needed and safe
+- Add visual analytics where safe and reasonable:
+  - Risk distribution across courses
+  - Alert trends over time
+  - Course risk comparison
+  - Historical risk changes
+- Allow expanding/collapsing alert details if it fits the existing UI style.
+- Allow marking alerts as resolved.
+- Allow dismissing alerts from the active dashboard view while preserving them in Alert History.
+- Add empty states when no alerts exist.
+- Add loading states if the project already uses loading patterns.
+- Add user-friendly error states and handle missing data gracefully.
+- Support responsive design, keyboard navigation, readable contrast, and clear spacing.
+
+Database and data requirements:
+- First inspect the current database/schema/data structure.
+- Reuse existing data as much as possible.
+- Add only the minimum database support required for Risk Alerts.
+- Do not restructure the DB or existing data unless absolutely necessary.
+- Add only relevant data that supports this feature, such as:
+  - Alert records
+  - Alert statuses
+  - Alert severity
+  - Recommendation text
+  - Risk score values
+  - Demo data needed to show alerts
+- Prevent duplicate alerts for the same student, course, alert type, and related item where possible.
+- Preserve alert history even when an alert is resolved or dismissed.
+- Make sure alert persistence works correctly.
+
+Traceability Requirements:
+- Every implemented feature must be clearly mapped to its related User Story ID: US1–US7.
+- Every database table/model, API endpoint, UI component, and business rule related to Risk Alerts should clearly indicate which User Story it supports.
+- Maintain traceability between User Stories, implementation, and future test cases.
+
+Validation and quality requirements:
+- Handle missing data.
+- Handle null values.
+- Handle invalid grades.
+- Handle invalid attendance values.
+- Handle missing assignments.
+- Handle empty recommendation content.
+- Avoid duplicate alerts.
+- Verify alert triggers.
+- Verify database persistence.
+- Verify dashboard integration.
+
+After implementation, provide a short report:
+1. What files were changed
+2. What new files were added
+3. What database changes or data additions were made
+4. How each User Story US1–US7 was implemented
+5. How the Risk Alerts module is integrated into the Student Academic Analytics system
+6. How to test the Risk Alerts module
+7. How to verify that Average Grade, Comparison to Class Average, Submission Rate, Weekly Submission Schedule, and Dashboard still work

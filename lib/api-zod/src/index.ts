@@ -25,3 +25,7 @@ export type { SubmissionRatePoint } from "./generated/types/submissionRatePoint"
 export type { SubmissionRateReport } from "./generated/types/submissionRateReport";
 export type { TrendPoint } from "./generated/types/trendPoint";
 export type { WeeklyAssignment } from "./generated/types/weeklyAssignment";
+export type { RiskAlert } from "./generated/types/riskAlert";
+export type { AlertSummary } from "./generated/types/alertSummary";
+export type { AlertsReport } from "./generated/types/alertsReport";
+export type { AlertStatusInput } from "./generated/types/alertStatusInput";

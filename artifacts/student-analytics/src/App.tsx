@@ -14,6 +14,7 @@ import Comparison from "@/pages/comparison";
 import Averages from "@/pages/averages";
 import Schedule from "@/pages/schedule";
 import Submissions from "@/pages/submissions";
+import Alerts from "@/pages/alerts";
 import { GraduationCap } from "lucide-react";
 
 const queryClient = new QueryClient({
@@ -48,6 +49,7 @@ function ProtectedShell() {
         <Route path="/averages" component={Averages} />
         <Route path="/schedule" component={Schedule} />
         <Route path="/submissions" component={Submissions} />
+        <Route path="/alerts" component={Alerts} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

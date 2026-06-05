@@ -20,17 +20,21 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AlertStatusInput,
+  AlertsReport,
   AssignmentCompleteInput,
   AttendanceReport,
   AveragesReport,
   ComparisonReport,
   Course,
   DashboardSummary,
+  GetAlertsParams,
   GetAveragesParams,
   GetSubmissionRateParams,
   GradeBreakdown,
   HealthStatus,
   MissedAssignment,
+  RiskAlert,
   SubmissionGoal,
   SubmissionGoalInput,
   SubmissionRateReport,
@@ -859,6 +863,169 @@ export function useGetMissedAssignments<TData = Awaited<ReturnType<typeof getMis
 
 
 
+
+export const getGetAlertsUrl = (studentId: number,
+    params?: GetAlertsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/alerts/${studentId}?${stringifiedParams}` : `/api/alerts/${studentId}`
+}
+
+/**
+ * @summary List risk alerts (generates fresh alerts, then returns filtered/sorted/paginated results)
+ */
+export const getAlerts = async (studentId: number,
+    params?: GetAlertsParams, options?: RequestInit): Promise<AlertsReport> => {
+
+  return customFetch<AlertsReport>(getGetAlertsUrl(studentId,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAlertsQueryKey = (studentId: number,
+    params?: GetAlertsParams,) => {
+    return [
+    `/api/alerts/${studentId}`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetAlertsQueryOptions = <TData = Awaited<ReturnType<typeof getAlerts>>, TError = ErrorType<unknown>>(studentId: number,
+    params?: GetAlertsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAlerts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAlertsQueryKey(studentId,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAlerts>>> = ({ signal }) => getAlerts(studentId,params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(studentId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAlerts>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAlertsQueryResult = NonNullable<Awaited<ReturnType<typeof getAlerts>>>
+export type GetAlertsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List risk alerts (generates fresh alerts, then returns filtered/sorted/paginated results)
+ */
+
+export function useGetAlerts<TData = Awaited<ReturnType<typeof getAlerts>>, TError = ErrorType<unknown>>(
+ studentId: number,
+    params?: GetAlertsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAlerts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAlertsQueryOptions(studentId,params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateAlertStatusUrl = (studentId: number,
+    alertId: number,) => {
+
+
+
+
+  return `/api/alerts/${studentId}/${alertId}`
+}
+
+/**
+ * @summary Update an alert's status (mark resolved or dismissed)
+ */
+export const updateAlertStatus = async (studentId: number,
+    alertId: number,
+    alertStatusInput: AlertStatusInput, options?: RequestInit): Promise<RiskAlert> => {
+
+  return customFetch<RiskAlert>(getUpdateAlertStatusUrl(studentId,alertId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      alertStatusInput,)
+  }
+);}
+
+
+
+
+export const getUpdateAlertStatusMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAlertStatus>>, TError,{studentId: number;alertId: number;data: BodyType<AlertStatusInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateAlertStatus>>, TError,{studentId: number;alertId: number;data: BodyType<AlertStatusInput>}, TContext> => {
+
+const mutationKey = ['updateAlertStatus'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAlertStatus>>, {studentId: number;alertId: number;data: BodyType<AlertStatusInput>}> = (props) => {
+          const {studentId,alertId,data} = props ?? {};
+
+          return  updateAlertStatus(studentId,alertId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAlertStatusMutationResult = NonNullable<Awaited<ReturnType<typeof updateAlertStatus>>>
+    export type UpdateAlertStatusMutationBody = BodyType<AlertStatusInput>
+    export type UpdateAlertStatusMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update an alert's status (mark resolved or dismissed)
+ */
+export const useUpdateAlertStatus = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAlertStatus>>, TError,{studentId: number;alertId: number;data: BodyType<AlertStatusInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateAlertStatus>>,
+        TError,
+        {studentId: number;alertId: number;data: BodyType<AlertStatusInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateAlertStatusMutationOptions(options));
+    }
 
 export const getUpdateSubmissionGoalUrl = (studentId: number,) => {
 

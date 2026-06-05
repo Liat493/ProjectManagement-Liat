@@ -150,3 +150,54 @@ export const courseFinalGradesTable = pgTable(
     ),
   }),
 );
+
+// Sprint 3 — Risk Alerts module (US1–US7).
+// Persistent store of generated risk alerts. Alerts are generated dynamically
+// from existing academic data (grades, attendance, submissions) and upserted
+// here so history is preserved across resolve/dismiss actions.
+//   alertType: 'low_grade' (US1) | 'attendance' (US2) | 'declining_trend' (US3)
+//              | 'missing_submission' (US4) | 'late_submission' (US4)
+//              | 'high_risk_course' (US5)
+//   severity:  'low' | 'medium' | 'high'
+//   status:    'active' | 'resolved' | 'dismissed'
+//   userStory: 'US1'..'US7' (traceability)
+//   relatedKey: stable identifier of the underlying item (e.g. grade id,
+//               course id, assignment id) used to de-duplicate generation.
+//   riskScore:  populated for high_risk_course alerts (US5); null otherwise.
+//   courseName: denormalised so history stays readable independently.
+export const riskAlertsTable = pgTable(
+  "risk_alerts",
+  {
+    id: serial("id").primaryKey(),
+    studentId: integer("student_id").notNull(),
+    alertType: text("alert_type").notNull(),
+    courseId: integer("course_id"),
+    courseName: text("course_name"),
+    title: text("title").notNull(),
+    message: text("message").notNull(),
+    severity: text("severity").notNull(),
+    status: text("status").notNull().default("active"),
+    recommendation: text("recommendation").notNull(),
+    userStory: text("user_story").notNull(),
+    relatedKey: text("related_key").notNull(),
+    riskScore: real("risk_score"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => ({
+    studentIdx: index("risk_alerts_student_idx").on(t.studentId),
+    studentStatusIdx: index("risk_alerts_student_status_idx").on(
+      t.studentId,
+      t.status,
+    ),
+    uniq: uniqueIndex("risk_alerts_uniq").on(
+      t.studentId,
+      t.alertType,
+      t.relatedKey,
+    ),
+  }),
+);
