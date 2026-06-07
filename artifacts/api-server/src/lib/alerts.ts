@@ -274,6 +274,12 @@ export async function generateAlerts(studentId: number): Promise<void> {
   }
 
   void assignmentMap;
+
+  // Duplicate alerts are prevented by the unique (studentId, alertType,
+  // relatedKey) index — each alert maps to a single stable source item
+  // (grade:{id}, missing:{assignmentId}, …). Orphaned rows whose source item
+  // was deleted are handled by data cleanup, not a content filter here, so
+  // genuinely distinct alerts are never silently dropped.
   if (candidates.length === 0) return;
 
   const rows = candidates.map((c) => ({

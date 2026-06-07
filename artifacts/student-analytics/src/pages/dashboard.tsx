@@ -133,10 +133,10 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         <StatCard
           href="/averages"
-          label="Overall Average"
-          value={overallAverage ? `${overallAverage.toFixed(1)}%` : "—"}
+          label="Grade Average"
+          value={overallAverage ? `${overallAverage.toFixed(1)}` : "—"}
           icon={BookOpen}
-          iconTone="bg-primary/10 text-primary"
+          iconTone="bg-violet-50 dark:bg-violet-950/30 text-violet-600 dark:text-violet-400"
           subtitle={classComparisonSummary}
         />
         <StatCard
@@ -180,13 +180,19 @@ export default function Dashboard() {
               <div className="space-y-4">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground mb-1 flex items-center gap-1.5">
-                    <TrendingUp className="h-4 w-4 text-emerald-500" /> Strongest
+                    <span className="inline-flex p-1 rounded-md bg-emerald-50 dark:bg-emerald-950/30">
+                      <TrendingUp className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                    </span>{" "}
+                    Strongest
                   </p>
                   <p className="font-semibold text-foreground line-clamp-1">{bestCourse || "—"}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground mb-1 flex items-center gap-1.5">
-                    <TrendingDown className="h-4 w-4 text-destructive" /> Needs Focus
+                    <span className="inline-flex p-1 rounded-md bg-red-50 dark:bg-red-950/30">
+                      <TrendingDown className="h-3.5 w-3.5 text-red-600 dark:text-red-400" />
+                    </span>{" "}
+                    Needs Focus
                   </p>
                   <p className="font-semibold text-foreground line-clamp-1">{weakestCourse || "—"}</p>
                 </div>

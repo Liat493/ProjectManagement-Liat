@@ -356,9 +356,50 @@ export async function generateRecommendations(studentId: number): Promise<void> 
     .select()
     .from(recommendationsTable)
     .where(eq(recommendationsTable.studentId, studentId));
+  const existingByKey = new Map(
+    existing.map((r) => [`${r.recommendationType}::${r.relatedKey}`, r]),
+  );
+
+  // --- US19: collapse near-duplicate cards -------------------------------
+  // Candidates that would render identically (same type, course, message and
+  // reason — e.g. several risk-followups echoing the same low grade in one
+  // course) are grouped and reduced to a single canonical card. Genuinely
+  // different source items keep distinct reasons (e.g. different assignment
+  // names) and are preserved. Canonical selection is lifecycle-aware: prefer
+  // the row already shown (active) over one that can be reactivated
+  // (auto-completed / brand new), and never promote a card the student
+  // manually dismissed/completed — so dedupe never hides a valid card nor
+  // resurrects a dismissed one.
+  const dedupeGroups = new Map<string, Candidate[]>();
+  for (const c of candidates) {
+    const sig = `${c.recommendationType}|${c.courseId ?? "g"}|${c.message}|${c.reason}`;
+    const arr = dedupeGroups.get(sig);
+    if (arr) arr.push(c);
+    else dedupeGroups.set(sig, [c]);
+  }
+  const canonicalRank = (c: Candidate): number => {
+    const row = existingByKey.get(`${c.recommendationType}::${c.relatedKey}`);
+    if (!row) return 2; // brand new -> will insert as active
+    if (row.status === "active") return 3; // already visible -> most stable
+    if (row.autoCompleted) return 1; // auto-completed -> reactivatable
+    return 0; // manually dismissed/completed -> avoid promoting
+  };
+  const deduped: Candidate[] = [];
+  for (const group of dedupeGroups.values()) {
+    let best = group[0]!;
+    let bestRank = canonicalRank(best);
+    for (let i = 1; i < group.length; i++) {
+      const rk = canonicalRank(group[i]!);
+      if (rk > bestRank) {
+        best = group[i]!;
+        bestRank = rk;
+      }
+    }
+    deduped.push(best);
+  }
 
   const currentKeys = new Set(
-    candidates.map((c) => `${c.recommendationType}::${c.relatedKey}`),
+    deduped.map((c) => `${c.recommendationType}::${c.relatedKey}`),
   );
 
   // (1) Auto-complete active rows whose condition no longer holds (US15/US19).
@@ -374,7 +415,7 @@ export async function generateRecommendations(studentId: number): Promise<void> 
       .where(eq(recommendationsTable.id, r.id));
   }
 
-  if (candidates.length === 0) return;
+  if (deduped.length === 0) return;
 
   // (2) Upsert current candidates. On conflict we refresh content for rows that
   // are currently active OR were auto-completed, and (re)set them to active.
@@ -382,7 +423,7 @@ export async function generateRecommendations(studentId: number): Promise<void> 
   // are excluded by setWhere, so a student's explicit choice is never undone.
   // Refreshing active rows keeps their message/reason/priority in sync with the
   // latest data (US19).
-  for (const c of candidates) {
+  for (const c of deduped) {
     await db
       .insert(recommendationsTable)
       .values({

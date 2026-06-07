@@ -1,0 +1,150 @@
+This is a final targeted polish/fix prompt for the existing Student Academic Analytics system.
+
+Important:
+The system is already working and already includes the following features:
+- Dashboard
+- Grade Averages
+- Class Comparison
+- Submission Rate
+- Weekly Schedule
+- Risk Alerts
+- Heatmap Analytics
+- Learning Habit Tracking
+- Smart Recommendations
+
+Apply ONLY the specific fixes listed below.
+
+Critical rules:
+- Do not rebuild the application.
+- Do not redesign the application.
+- Do not refactor unrelated code.
+- Do not rename, remove, rewrite, or break any existing feature, component, route, API, database table, database field, or UI behavior.
+- Do not change calculations unless explicitly required by one of the fixes below.
+- Do not add new features.
+- Do not change existing demo data unless explicitly required below.
+- Do not change unrelated UI sections.
+- Preserve all current functionality and navigation.
+- Make the smallest safe changes required to complete the requested fixes.
+- After applying each fix, verify that the existing modules still work.
+
+Required fixes:
+
+1. Risk Alerts – Add missing Declining Performance demo coverage
+The Risk Alerts module is missing visible demo coverage for the Declining Performance Trend Alert.
+
+Fix:
+- Add or adjust realistic demo grade history for one existing demo student/course so that the existing Risk Alerts logic naturally generates a Declining Performance Trend Alert.
+- The declining trend should be based on multiple assessments with a clear sustained decline.
+- Do not hardcode the alert.
+- Do not create a fake UI-only alert.
+- Do not change unrelated Risk Alerts logic.
+- Do not affect Grade Averages, Heatmap Analytics, Smart Recommendations, Learning Habit Tracking, or any existing feature.
+- The new alert should appear in Risk Alerts and should be traceable to the relevant User Story for declining performance.
+
+2. Risk Alerts – Remove duplicate alerts
+There are duplicate or near-duplicate alerts, especially Low Grade alerts for the same course/grade/source item.
+
+Fix:
+- Prevent duplicate alerts for the same student, course, alert type, source item, date, and value.
+- Example: the same Low Grade alert for Calculus II, same quiz, same grade, and same date should appear only once.
+- Keep separate alerts only if they are based on genuinely different source items, such as different assignments, different grades, different dates, or different alert types.
+- Do not remove valid unique alerts.
+- Do not change the alert UI layout.
+- Do not change unrelated Risk Alerts behavior.
+
+3. Learning Habit Tracking – Remove “Missing” from Submission Habits
+The Learning Habit Tracking module currently shows Submission Habits with On Time, Late, and Missing.
+
+Fix:
+- In Learning Habit Tracking only, remove the “Missing” category from the Submission Habits widget.
+- Keep only:
+  - On Time
+  - Late
+- Update the visual bar, labels, counts, and text so they reflect only On Time vs Late submission habits.
+- Do not affect the existing separate Submission Rate feature.
+- Do not remove missing assignment logic from other modules such as Dashboard, Risk Alerts, Smart Recommendations, or Submission Rate.
+- This change applies only to the Submission Habits section inside Learning Habit Tracking.
+
+4. Smart Recommendations – Remove duplicate or near-duplicate recommendations
+Smart Recommendations currently shows some duplicate or near-duplicate recommendation cards.
+
+Fix:
+- Do not show multiple recommendation cards when they refer to the same student, course, recommendation type, source item, and reason.
+- Keep separate recommendations only when they are based on genuinely different source items, such as:
+  - different assignments
+  - different alerts
+  - different grades
+  - different weak topics
+  - different courses
+- Do not remove valid unique recommendations.
+- Do not change the Smart Recommendations page layout.
+- Do not change recommendation logic beyond deduplication.
+- Preserve dismiss and mark-completed behavior.
+
+5. Smart Recommendations – Standardize dates to English
+Some recommendation card dates currently appear in mixed Hebrew/English formatting.
+
+Fix:
+- Standardize recommendation card dates to English.
+- Use a consistent English date format such as:
+  - “Jun 5”
+  or
+  - “June 5”
+- Do not mix Hebrew and English in Smart Recommendations dates.
+- Apply this only to Smart Recommendations unless the same date formatter is safely shared across the app.
+- Do not change unrelated date displays if it risks affecting other modules.
+
+6. Dashboard – Display grade average as a grade, not a percentage
+The Dashboard currently shows the grade average as a percentage, which is less clear for an academic grade average.
+
+Fix:
+- Change the Dashboard KPI label from “Overall Average” to “Grade Average”.
+- Display the grade average value as a grade format without the percent sign.
+  Example:
+  - Change “86.0%” to “86.0”
+- Do not change the underlying calculation.
+- Do not change Grade Averages page logic.
+- Keep percentage signs for:
+  - Submission Rate
+  - Attendance / Attendance Rate
+- This is only a display formatting change for the Dashboard grade average KPI.
+
+7. Dashboard – Add slightly more visual color polish only
+Improve the Dashboard visual appearance with a bit more color, but only as a small design polish.
+
+Fix:
+- Add subtle, professional color accents to Dashboard cards/icons/badges where appropriate.
+- Keep the current Dashboard layout, structure, and content.
+- Do not move sections.
+- Do not add new widgets.
+- Do not remove existing widgets.
+- Do not change Dashboard calculations or data.
+- Do not make the design overly colorful or distracting.
+- Keep the style consistent with the rest of the Student Academic Analytics system.
+
+Validation after fixes:
+After applying the fixes, verify:
+- Dashboard still loads.
+- Grade Averages still works.
+- Class Comparison still works.
+- Submission Rate still works.
+- Weekly Schedule still works.
+- Risk Alerts still works.
+- Heatmap Analytics still works.
+- Learning Habit Tracking still works.
+- Smart Recommendations still works.
+- No duplicate alerts remain for the same source item.
+- Declining Performance Alert appears in the Risk Alerts demo through real demo data.
+- Learning Habit Tracking Submission Habits shows only On Time and Late.
+- Smart Recommendations no longer shows duplicate recommendation cards.
+- Smart Recommendations dates are in English.
+- Dashboard Grade Average displays without a percent sign.
+- Submission Rate and Attendance still display with percent signs.
+- No unrelated functionality was changed.
+
+After implementation, provide a short report:
+1. Files changed
+2. Data/demo data changes made
+3. How each requested fix was implemented
+4. Confirmation that no unrelated feature was changed
+5. Confirmation that all existing modules still work

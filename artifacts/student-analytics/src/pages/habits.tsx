@@ -483,13 +483,12 @@ function SubmissionHabits({
       ? data.overall
       : data.byCourse.find((c) => c.courseId === courseId) ?? data.overall;
 
-  const missing = Math.max(0, active.total - active.onTime - active.late);
   const segments = [
     { label: "On time", value: active.onTime, tone: "bg-emerald-500" },
     { label: "Late", value: active.late, tone: "bg-amber-500" },
-    { label: "Missing", value: missing, tone: "bg-red-500" },
   ];
-  const total = Math.max(1, active.total);
+  const submitted = active.onTime + active.late;
+  const total = Math.max(1, submitted);
 
   return (
     <section className="space-y-4">
@@ -516,16 +515,15 @@ function SubmissionHabits({
             ))}
           </div>
 
-          {active.total === 0 ? (
+          {submitted === 0 ? (
             <p className="text-sm text-muted-foreground py-6 text-center">
-              No assignments with passed deadlines for this selection yet.
+              No submitted assignments to evaluate for this selection yet.
             </p>
           ) : (
             <>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <SubStat label="On time" value={active.onTime} tone="text-emerald-600 dark:text-emerald-400" icon={CheckCircle2} />
                 <SubStat label="Late" value={active.late} tone="text-amber-600 dark:text-amber-500" icon={Clock} />
-                <SubStat label="Missing" value={missing} tone="text-red-600 dark:text-red-400" icon={X} />
               </div>
 
               <div className="space-y-2">
@@ -552,15 +550,11 @@ function SubmissionHabits({
               </div>
 
               <p className="text-sm text-muted-foreground">
-                Submission rate:{" "}
-                <span className="font-semibold text-foreground">{active.submissionRate}%</span>{" "}
-                of {active.total} assignment{active.total === 1 ? "" : "s"} submitted
-                {active.onTime + active.late > 0 && (
-                  <>
-                    {" "}— {Math.round((active.onTime / Math.max(1, active.onTime + active.late)) * 100)}% of those on time
-                  </>
-                )}
-                .
+                <span className="font-semibold text-foreground">
+                  {Math.round((active.onTime / Math.max(1, submitted)) * 100)}%
+                </span>{" "}
+                of your {submitted} submitted assignment{submitted === 1 ? "" : "s"}{" "}
+                {submitted === 1 ? "was" : "were"} on time.
               </p>
             </>
           )}

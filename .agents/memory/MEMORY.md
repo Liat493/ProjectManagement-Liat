@@ -1,2 +1,1 @@
-- [Orval hook data typing](orval-hook-data-typing.md) — typing props as `ReturnType<typeof useGetX>["data"]` collapses to `{}`; import the generated response type instead. Rebuild api-client-react dist after codegen.
-- [Reconciliation upsert setWhere](recommendation-reconciliation-upsert.md) — regenerate-on-read engines: `setWhere` must be `status='active' OR <sentinel>`, not the sentinel alone, or still-active rows go stale.
+- [Recommendation vs alert dedup](recommendation-dedup.md) — collapsing same-content cards must be lifecycle-aware for recs (rank canonical, load existing first); risk-alert orphans cleaned via data, never a content filter.

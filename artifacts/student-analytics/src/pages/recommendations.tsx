@@ -279,7 +279,7 @@ function RecommendationCard({
             </span>
           )}
           <span className="text-[11px] text-muted-foreground ml-auto">
-            {new Date(rec.createdAt).toLocaleDateString(undefined, {
+            {new Date(rec.createdAt).toLocaleDateString("en-US", {
               month: "short",
               day: "numeric",
             })}
